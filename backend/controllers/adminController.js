@@ -157,3 +157,26 @@ export const rejectUser = async (req, res) => {
     res.status(500).json({ message: 'Error rejecting user', error: err.message });
   }
 };
+
+export const addCompany = async (req, res) => {
+    try {
+        const { name, role, resume, deadline } = req.body
+        const new_deadline = new Date(deadline)
+        await sequelize.transaction(async (t) => {
+
+            await sequelize.query(
+                `INSERT INTO company (name,role,resume,deadline)
+                VALUES (?,?,?,?)`,
+                {
+                    replacements: [name, role, resume, new_deadline],
+                    type: sequelize.QueryTypes.INSERT,
+                    transaction: t
+                }
+            )
+            res.status(201).json({ success: true })
+        });
+    }
+    catch (err) {
+        res.status(501).json({ error: err.message });
+    }
+}
