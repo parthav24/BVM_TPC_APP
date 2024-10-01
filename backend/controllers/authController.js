@@ -4,6 +4,7 @@ import sequelize from '../config/database.js';
 
 export const register = async (req, res) => {
     const { uid, dept_id, role, f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, ssc_percentage, hsc_percentage, diploma_cpi, no_active_backlog, no_dead_backlog } = req.body;
+
     const new_dob = new Date(dob).toISOString().slice(0, 10);
 
     try {
