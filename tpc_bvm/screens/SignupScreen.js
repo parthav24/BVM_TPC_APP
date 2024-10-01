@@ -25,21 +25,22 @@ const branches = [
   },
 ];
 
-// const radioButtons = useMemo(
-//   () => [
-//     {
-//       id: "1",
-//       label: "Male",
-//       value: "Male",
-//     },
-//     {
-//       id: "2",
-//       label: "Female",
-//       value: "Female",
-//     },
-//   ],
-//   []
-// );
+const radioButtons = useMemo(
+  () => [
+    {
+      id: "1",
+      label: "Male",
+      value: "Male",
+    },
+    {
+      id: "2",
+      label: "Female",
+      value: "Female",
+    },
+  ],
+  []
+);
+
 
 export default function SignUpScreen({ navigation }) {
   const [selectedId, setSelectedId] = useState();
@@ -137,11 +138,11 @@ export default function SignUpScreen({ navigation }) {
         onChangeText={(text) => handleChange("lastName", text)}
       />
 
-      {/* <RadioGroup
+      <RadioGroup
         radioButtons={radioButtons}
         onPress={setSelectedId}
         selectedId={selectedId}
-      /> */}
+      />
 
       <TextInput
         style={styles.input}
@@ -356,6 +357,8 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 16,
+    fontSize: 16,
+    fontWeight: "bold",
   },
   selectedTextStyle: {
     fontSize: 16,
