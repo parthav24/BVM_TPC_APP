@@ -8,7 +8,7 @@ export const approveUser = async (req, res) => {
     await sequelize.transaction(async (t) => {
       // Fetch the user from the pending_users table
       const pendingUser = await sequelize.query(
-        `SELECT * FROM pending_users WHERE uid = ?`,
+        `SELECT * FROM pending_students WHERE uid = ?`,
         {
           replacements: [uid],
           type: sequelize.QueryTypes.SELECT,
@@ -25,7 +25,7 @@ export const approveUser = async (req, res) => {
 
       // Insert the user into the users table
       await sequelize.query(
-        `INSERT INTO users (uid, dept_id, role, f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year)
+        `INSERT INTO students (uid, dept_id, role, f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         {
           replacements: [
@@ -100,7 +100,7 @@ export const approveUser = async (req, res) => {
       });
 
       // Remove the user from the pending_users table
-      await sequelize.query(`DELETE FROM pending_users WHERE uid = ?`, {
+      await sequelize.query(`DELETE FROM pending_students WHERE uid = ?`, {
         replacements: [uid],
         type: sequelize.QueryTypes.DELETE,
         transaction: t,
@@ -125,7 +125,7 @@ export const rejectUser = async (req, res) => {
     await sequelize.transaction(async (t) => {
       // Check if the user exists in the pending_users table
       const pendingUser = await sequelize.query(
-        `SELECT * FROM pending_users WHERE uid = ?`,
+        `SELECT * FROM pending_students WHERE uid = ?`,
         {
           replacements: [uid],
           type: sequelize.QueryTypes.SELECT,
@@ -145,7 +145,7 @@ export const rejectUser = async (req, res) => {
       });
 
       // Remove the user from the pending_users table
-      await sequelize.query(`DELETE FROM pending_users WHERE uid = ?`, {
+      await sequelize.query(`DELETE FROM pending_students WHERE uid = ?`, {
         replacements: [uid],
         type: sequelize.QueryTypes.DELETE,
         transaction: t,

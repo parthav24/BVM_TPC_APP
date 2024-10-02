@@ -63,6 +63,7 @@ export const getDepartmentById = async (req, res) => {
 export const updateDepartment = async (req, res) => {
   const { dept_id } = req.params;
   const { dept_name } = req.body;
+  console.log(dept_id, dept_name);
 
   try {
     const result = await sequelize.query(
