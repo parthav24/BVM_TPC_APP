@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import SignInScreen from '../screens/SignInScreen';
 import GuestScreen from '../screens/GuestScreen';
-import SignUpScreen from '../screens/SignUpScreen';
-import StudentDashboard from '../screens/StudentDashboard';
+import SignUpScreen from '../screens/SignupScreen';
+import StudentDashboard from '../screens/StudentDashboard'
 import PlacementStatistics from '../screens/PlacementStatistics';
 import AdminDashboard from '../screens/AdminDashboard';
 
