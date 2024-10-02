@@ -8,6 +8,7 @@ export const getUserProfile = async (req, res) => {
     }
 };
 
+// to be modified
 export const updateUserProfile = async (req, res) => {
     try {
         const { f_name, m_name, l_name, address } = req.body;
