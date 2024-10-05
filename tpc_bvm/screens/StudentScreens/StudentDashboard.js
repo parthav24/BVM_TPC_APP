@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput, Button } from 'react-native';
+import connString from '../../components/connectionString';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Sample data
 const placementDrives = {
@@ -25,6 +28,10 @@ export default function StudentDashboard() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDrive, setSelectedDrive] = useState(null);
   const [appliedDrives, setAppliedDrives] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [upcoming, setUpcoming] = useState([]);
+  const [ongoing, setOngoing] = useState([]);
+  const [completed, setCompleted] = useState([]);
 
   const handleApply = (drive) => {
     setSelectedDrive(drive);
@@ -38,6 +45,28 @@ export default function StudentDashboard() {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${connString}/user/get-companies`)
+        console.log(response.data);
+        setUserData(JSON.parse(await AsyncStorage.getItem('userData')));
+      } catch (error) {
+        console.error('Login failed:', error.response ? error.response.data : error.message);
+      }
+    }
+    fetchData()
+  }, [])
+
+  const isEligible = () => {
+    // Check eligibility based on company requirements and user details
+    const meetsCPI = user.cpi >= company.req_CPI;
+    const meetsBacklogs = (company.max_active_backlogs === null || user.no_active_backlog <= company.max_active_backlogs) &&
+      (company.max_dead_backlogs === null || user.no_dead_backlog <= company.max_dead_backlogs);
+
+    return meetsCPI && meetsBacklogs;
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>{item.company}</Text>
@@ -45,9 +74,12 @@ export default function StudentDashboard() {
         <>
           <Text style={styles.itemSubText}>Date: {item.date}</Text>
           <Text style={styles.itemSubText}>Eligibility: {item.eligibility}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => handleApply(item)}>
+          <TouchableOpacity style={styles.button} onPress={() => handleApply(item)} >
             <Text style={styles.buttonText}>Apply</Text>
           </TouchableOpacity>
+          <Text style={styles.error}>
+            You are not eligible to apply for this position.
+          </Text>
         </>
       )}
       {selectedTab === 'completed' && (
@@ -65,13 +97,13 @@ export default function StudentDashboard() {
 
       <View style={styles.tabContainer}>
         <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('ongoing')}>
-          <Text style={styles.tabButtonText}>Ongoing Drives</Text>
+          <Text style={styles.tabButtonText}>Ongoing</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('upcoming')}>
-          <Text style={styles.tabButtonText}>Upcoming Drives</Text>
+          <Text style={styles.tabButtonText}>Upcoming</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('completed')}>
-          <Text style={styles.tabButtonText}>Completed Drives</Text>
+          <Text style={styles.tabButtonText}>Completed</Text>
         </TouchableOpacity>
       </View>
 
@@ -122,11 +154,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tabContainer: {
+    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 20,
   },
   tabButton: {
+    flex: 1,
+    alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 10,
@@ -135,7 +170,7 @@ const styles = StyleSheet.create({
   tabButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
   list: {
     marginBottom: 20,
@@ -190,5 +225,9 @@ const styles = StyleSheet.create({
   link: {
     color: 'blue',
     textDecorationLine: 'underline',
+  },
+  error: {
+    color: 'red',
+    marginTop: 10,
   },
 });

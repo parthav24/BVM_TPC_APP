@@ -25,7 +25,7 @@ export const getPlacementData = async (req, res) => {
     try {
         await sequelize.transaction(async (t) => {
             const placement_data = await sequelize.query(
-                `SELECT s.f_name,s.l_name,d.dept_name,p.package,c.name FROM
+                `SELECT s.f_name,s.l_name,d.dept_name,p.package,c.name as company_name FROM
                 placement_data p JOIN students s ON p.uid = s.uid 
                 JOIN company c ON p.company_id = c.company_id
                 JOIN department d ON s.dept_id = d.dept_id`,

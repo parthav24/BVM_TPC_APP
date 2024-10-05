@@ -1,6 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import tpcRoutes from './routes/tpcRoutes.js';
@@ -12,7 +14,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+console.log(process.env.FRONTEND_URL);
+app.use(cors({
+    origin: [process.env.FRONTEND_URL],
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
+    credentials: true
+}));
+
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);

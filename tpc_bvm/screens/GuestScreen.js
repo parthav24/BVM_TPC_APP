@@ -1,15 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import connString from '../components/connectionString';
+import axios from 'axios';
 import { View, Text, StyleSheet, FlatList, Modal, Image, TouchableOpacity } from 'react-native';
-
-const studentData = [
-  { id: '1', srNo: '1', student: 'Dhruv Italiya', branch: 'CP', placedIn: 'Google', package: '20 LPA', offerLetter: 'View' },
-  { id: '2', srNo: '2', student: 'Parthav Chodvadiya', branch: 'CP', placedIn: 'Amazon', package: '18 LPA', offerLetter: 'View' },
-  // Add more student data here...
-];
 
 export default function GuestScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [studentData, setStudentData] = useState([]);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("Hii");
+        const { data } = await axios.get(`${connString}/guest/get-placement-data`);
+        console.log("sir ");
+        const dataWithSrNo = data.placement_data.map((student, idx) => ({
+          ...student,
+          srNo: idx + 1
+        }))        
+
+        setStudentData(dataWithSrNo);
+        setLoading(false);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch data');
+        setLoading(false);
+      }
+    }
+    fetchData();
+    console.log("hello");
+
+  }, []);
 
   const handleOfferLetterClick = () => {
     setSelectedImage(require('../assets/tpc_logo.png'));
@@ -22,20 +44,20 @@ export default function GuestScreen() {
         <Text style={styles.cellText}>{item.srNo}</Text>
       </View>
       <View style={styles.cell}>
-        <Text style={styles.cellText}>{item.student}</Text>
+        <Text style={styles.cellText}>{item.f_name + ' ' + item.l_name}</Text>
       </View>
       <View style={styles.cell}>
-        <Text style={styles.cellText}>{item.branch}</Text>
+        <Text style={styles.cellText}>{item.dept_name}</Text>
       </View>
       <View style={styles.cell}>
-        <Text style={styles.cellText}>{item.placedIn}</Text>
+        <Text style={styles.cellText}>{item.company_name}</Text>
       </View>
       <View style={styles.cell}>
-        <Text style={styles.cellText}>{item.package}</Text>
+        <Text style={styles.cellText}>{item.package+' LPA'}</Text>
       </View>
-      <TouchableOpacity onPress={handleOfferLetterClick} style={styles.cell}>
+      {/* <TouchableOpacity onPress={handleOfferLetterClick} style={styles.cell}>
         <Text style={[styles.cellText, { color: 'blue' }]}>{item.offerLetter}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 
@@ -59,14 +81,14 @@ export default function GuestScreen() {
           <View style={styles.headerCell}>
             <Text style={styles.headerText}>Package</Text>
           </View>
-          <View style={styles.headerCell}>
+          {/* <View style={styles.headerCell}>
             <Text style={styles.headerText}>Offer Letter</Text>
-          </View>
+          </View> */}
         </View>
         <FlatList
           data={studentData}
           renderItem={renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.srNo}
         />
       </View>
 
@@ -98,7 +120,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     backgroundColor: "#841584",
-    padding:10,
+    padding: 10,
     color: '#ffffff',
     fontWeight: 'bold',
     textAlign: 'center',

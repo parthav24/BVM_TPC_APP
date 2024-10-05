@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import sequelize from '../config/database.js';
 
 export const studentRegister = async (req, res) => {
-    const { uid, dept_id, role, f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, ssc_percentage, hsc_percentage, diploma_cpi, no_active_backlog, no_dead_backlog } = req.body;
+    const { uid, dept_id,f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, ssc_percentage, hsc_percentage, diploma_cpi, no_active_backlog, no_dead_backlog } = req.body;
 
     const new_dob = new Date(dob).toISOString().slice(0, 10);
 
@@ -13,14 +13,32 @@ export const studentRegister = async (req, res) => {
         await sequelize.transaction(async (t) => {
             // Insert into users table
             await sequelize.query(
-                `INSERT INTO pending_students (uid, dept_id, role, f_name, m_name, l_name, dob,gender, email, mobile, address, password, passout_year) 
-                VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?)`,
+                `INSERT INTO pending_students (uid, dept_id, f_name, m_name, l_name, dob,gender, email, mobile, address, password, passout_year) 
+                VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)`,
                 {
-                    replacements: [uid, dept_id, role, f_name, m_name, l_name, new_dob, gender, email, mobile, address, hashedPassword, passout_year],
+                    replacements: [uid, dept_id, f_name, m_name, l_name, new_dob, gender, email, mobile, address, hashedPassword, passout_year],
                     type: sequelize.QueryTypes.INSERT,
                     transaction: t
                 }
             );
+
+            // const calculateAverageSPI = () => {
+            //     const { sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, diploma_cpi } = formData;
+
+            //     const sems = [sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8].filter(spi => spi !== null);
+
+            //     // If diploma_cpi is provided, treat it as sem1 and sem2
+            //     if (diploma_cpi !== null) {
+            //       sems.unshift(diploma_cpi); // Add diploma_cpi to the start
+            //       sems.unshift(diploma_cpi); // Add it again for the second semester
+            //     }
+
+            //     // Calculate average
+            //     const total = sems.reduce((acc, curr) => acc + curr, 0);
+            //     const average = sems.length > 0 ? total / sems.length : 0;
+
+            //     return average;
+            //   };
 
             // Insert into result table
             const cpi = (sem1 + sem2 + sem3 + sem4) / 4;
@@ -43,13 +61,12 @@ export const studentRegister = async (req, res) => {
 
 export const login = async (req, res) => {
     const { uid, role, password } = req.body;
-
     try {
         let user;
         if (role === 'student') {
             // Fetch the user with the given uid and role
             user = await sequelize.query(
-                `SELECT * FROM students WHERE uid = ?`,
+                `SELECT * FROM students join result on students.uid=result.id WHERE uid = ?`,
                 {
                     replacements: [uid],
                     type: sequelize.QueryTypes.SELECT,
@@ -94,7 +111,7 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION }
         );
-
+        delete user[0].password;
         // If the password matches, proceed with login
         res.status(200).json({ message: 'Login successful', user: user[0], token });
     } catch (err) {

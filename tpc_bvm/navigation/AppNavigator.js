@@ -4,23 +4,27 @@ import HomeScreen from '../screens/HomeScreen';
 import SignInScreen from '../screens/SignInScreen';
 import GuestScreen from '../screens/GuestScreen';
 import SignUpScreen from '../screens/SignupScreen';
-import StudentDashboard from '../screens/StudentDashboard'
+import StudentNavigator from './StudentNavigator';
+import TPCNavigator from './TPCNavigator';
+import TPONavigator from './TPONavigator';
 import PlacementStatistics from '../screens/PlacementStatistics';
-import AdminDashboard from '../screens/AdminDashboard';
 
 const Stack = createStackNavigator();
 
 function AppNavigator() {
+  const userRole = 'student'
   return (
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SignIn" component={SignInScreen} />
-        <Stack.Screen name="Guest" component={GuestScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="Dashboard" component={StudentDashboard} />
-        <Stack.Screen name="Statistics" component={PlacementStatistics} />
-        <Stack.Screen name="Admin" component={AdminDashboard} />
-      </Stack.Navigator>
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SignIn" component={SignInScreen} />
+      <Stack.Screen name="Guest" component={GuestScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="Statistics" component={PlacementStatistics} />
+
+      {userRole === 'student' && <Stack.Screen name="Student" component={StudentNavigator} options={{ headerShown: false }} />}
+      {userRole === 'tpc' && <Stack.Screen name="TPC" component={TPCNavigator} options={{ headerShown: false }} />}
+      {userRole === 'tpo' && <Stack.Screen name="TPO" component={TPONavigator} options={{ headerShown: false }} />}
+    </Stack.Navigator>
   );
 }
 
