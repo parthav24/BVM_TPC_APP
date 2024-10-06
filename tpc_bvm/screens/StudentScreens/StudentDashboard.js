@@ -2,26 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput, Button } from 'react-native';
 import connString from '../../components/connectionString';
+import ApplyModal from '../../components/ApplyModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Sample data
-const placementDrives = {
-  ongoing: [
-    { id: '1', company: 'Google' },
-    { id: '2', company: 'Amazon' },
-    // Add more ongoing drives here...
-  ],
-  upcoming: [
-    { id: '1', company: 'Microsoft', date: '2024-08-25', eligibility: 'All Branches', formLink: 'http://example.com/form1', formEndDate: '2024-08-24' },
-    { id: '2', company: 'Apple', date: '2024-09-01', eligibility: 'CS, IT', formLink: 'http://example.com/form2', formEndDate: '2024-08-30' },
-    // Add more upcoming drives here...
-  ],
-  completed: [
-    { id: '1', company: 'IBM', startDate: '2024-07-10', endDate: '2024-07-12' },
-    { id: '2', company: 'Intel', startDate: '2024-07-15', endDate: '2024-07-18' },
-    // Add more completed drives here...
-  ],
-};
 
 export default function StudentDashboard() {
   const [selectedTab, setSelectedTab] = useState('upcoming');
@@ -29,9 +11,12 @@ export default function StudentDashboard() {
   const [selectedDrive, setSelectedDrive] = useState(null);
   const [appliedDrives, setAppliedDrives] = useState([]);
   const [userData, setUserData] = useState(null);
-  const [upcoming, setUpcoming] = useState([]);
-  const [ongoing, setOngoing] = useState([]);
-  const [completed, setCompleted] = useState([]);
+  const [application,setApplication] = useState({});
+  const [placementDrives, setPlacementDrives] = useState({
+    upcoming: [],
+    ongoing: [],
+    completed: [],
+  });
 
   const handleApply = (drive) => {
     setSelectedDrive(drive);
@@ -45,51 +30,107 @@ export default function StudentDashboard() {
     }
   };
 
+  const handleDate = (date) => {
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    // Format the date
+    const day = date.getDay();
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    const hours = (date.getHours() % 12) || 12; // Convert to 12-hour format
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    // Construct the final string
+    return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${connString}/user/get-companies`)
         console.log(response.data);
+        const currentDate = new Date();
+
+        const upcoming = [];
+        const ongoing = [];
+        const completed = [];
+
+        response.data.forEach(company => {
+          const deadline = new Date(company.deadline);
+          const visitDate = company.visit_date ? new Date(company.visit_date) : null;
+          const completeDate = company.complete_date ? new Date(company.complete_date) : null;
+
+          // Check for completed companies
+          if (completeDate) {
+            completed.push(company);
+          }
+          // Check for upcoming companies
+          else if (deadline > currentDate || (deadline < currentDate && (!visitDate || visitDate >= currentDate))) {
+            upcoming.push(company);
+          }
+          // Check for ongoing companies
+          else if (visitDate && visitDate < currentDate && !completeDate) {
+            ongoing.push(company);
+          }
+        });
+
+        setPlacementDrives({
+          upcoming,
+          ongoing,
+          completed,
+        });
+
         setUserData(JSON.parse(await AsyncStorage.getItem('userData')));
       } catch (error) {
-        console.error('Login failed:', error.response ? error.response.data : error.message);
+        console.error('Company data fetch failed:', error.response ? error.response.data : error.message);
       }
     }
     fetchData()
   }, [])
 
-  const isEligible = () => {
+  const isEligible = (item) => {
     // Check eligibility based on company requirements and user details
-    const meetsCPI = user.cpi >= company.req_CPI;
-    const meetsBacklogs = (company.max_active_backlogs === null || user.no_active_backlog <= company.max_active_backlogs) &&
-      (company.max_dead_backlogs === null || user.no_dead_backlog <= company.max_dead_backlogs);
+    if (!userData) return true;
+    const meetsCPI = userData.cpi >= item.req_CPI;
+
+    const meetsBacklogs = (item.max_active_backlogs === null || userData.no_active_backlog <= item.max_active_backlogs) &&
+      (item.max_dead_backlogs === null || userData.no_dead_backlog <= item.max_dead_backlogs);
 
     return meetsCPI && meetsBacklogs;
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemText}>{item.company}</Text>
-      {selectedTab === 'upcoming' && (
-        <>
-          <Text style={styles.itemSubText}>Date: {item.date}</Text>
-          <Text style={styles.itemSubText}>Eligibility: {item.eligibility}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => handleApply(item)} >
-            <Text style={styles.buttonText}>Apply</Text>
-          </TouchableOpacity>
-          <Text style={styles.error}>
-            You are not eligible to apply for this position.
-          </Text>
-        </>
-      )}
-      {selectedTab === 'completed' && (
-        <>
-          <Text style={styles.itemSubText}>Start Date: {item.startDate}</Text>
-          <Text style={styles.itemSubText}>End Date: {item.endDate}</Text>
-        </>
-      )}
-    </View>
-  );
+  const renderItem = ({ item }) => {
+    const eligibility = isEligible(item);
+    return (
+      <View style={styles.itemContainer}>
+        <Text style={styles.itemText}>{item.name}</Text>
+        {selectedTab === 'upcoming' && (
+          <>
+            <Text style={styles.itemSubText}>Deadline: {handleDate(new Date(item.deadline))}</Text>
+            <Text style={styles.itemSubText}>Minimum CPI: {item.req_CPI}</Text>
+            <Text style={styles.itemSubText}>Max Active Backlogs: {item.max_active_backlogs || "NA"}</Text>
+            <Text style={styles.itemSubText}>Max Dead Backlogs: {item.max_dead_backlogs || 'NA'}</Text>
+            <TouchableOpacity style={styles.button} onPress={() => handleApply(item)} disabled={!eligibility} >
+              <Text style={styles.buttonText}>Apply</Text>
+            </TouchableOpacity>
+            {!eligibility && userData && <Text style={styles.error}>
+              You are not eligible to apply for this position.
+            </Text>}
+          </>
+        )}
+        {selectedTab === 'completed' && (
+          <>
+            <Text style={styles.itemSubText}>Start Date: {item.complete_date}</Text>
+            <Text style={styles.itemSubText}>No. Placed Students: {item.no_of_students_placed}</Text>
+          </>
+        )}
+      </View>
+    )
+  };
 
   return (
     <View style={styles.container}>
@@ -110,7 +151,7 @@ export default function StudentDashboard() {
       <FlatList
         data={placementDrives[selectedTab]}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.company_id}
         style={styles.list}
       />
 
@@ -121,22 +162,11 @@ export default function StudentDashboard() {
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Resource Center</Text>
       </TouchableOpacity>
-
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Apply for {selectedDrive?.company}</Text>
-            <Text style={styles.modalText}>Form Link: <Text style={styles.link}>{selectedDrive?.formLink}</Text></Text>
-            <Text style={styles.modalText}>Form End Date: {selectedDrive?.formEndDate}</Text>
-            <Button title="Submit Application" onPress={handleApplySubmit} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+      <ApplyModal 
+        modalVisible={modalVisible} 
+        setModalVisible={setModalVisible} 
+        selectedDrive={selectedDrive} 
+      />
     </View>
   );
 }
