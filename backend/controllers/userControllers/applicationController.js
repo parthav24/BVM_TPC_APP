@@ -1,7 +1,7 @@
 import sequelize from '../../config/database.js'
 
 export const submitApplication = async (req, res) => {
-    const { company_id, uid, roles } = req.body; // company_id and userId must be sent in the request body
+    const { company_id, uid, roleIds } = req.body; // company_id and userId must be sent in the request body
 
     try {
         await sequelize.transaction(async (t) => {
@@ -18,14 +18,14 @@ export const submitApplication = async (req, res) => {
             let resumePath = null;
 
             // Step 2: If the company requires a resume, handle the file upload
-            if (company.resume) {
-                if (!req.file) {
-                    return res.status(400).json({ error: 'Resume is required for this application' });
-                }
-                // Multer saves the file to the specified directory
-                resumePath = req.file.path; // Get file path from multer
-            }
-            console.log(company_id, uid, resumePath);
+            // if (company.resume) {
+            //     if (!req.file) {
+            //         return res.status(400).json({ error: 'Resume is required for this application' });
+            //     }
+            //     // Multer saves the file to the specified directory
+            //     resumePath = req.file.path; // Get file path from multer
+            // }
+            console.log(company_id, uid, resumePath,roleIds);
 
             // Step 3: Store the application along with the resume path in the application table
             const application = await sequelize.query(
@@ -38,22 +38,22 @@ export const submitApplication = async (req, res) => {
             );
             console.log(application);
 
-            let roleIds = [];
-            // temporary
-            const array_roles = roles.split(',');
-            for (const role of array_roles) {
-                const roleId = await sequelize.query(
-                    `SELECT role_id FROM roles WHERE role_name = ?`,
-                    {
-                        replacements: [role],
-                        type: sequelize.QueryTypes.SELECT,
-                        transaction: t
-                    }
-                )
-                console.log(role, roleId);
+            // let roleIds = [];
+            // // temporary
+            // const array_roles = roles.split(',');
+            // for (const role of array_roles) {
+            //     const roleId = await sequelize.query(
+            //         `SELECT role_id FROM roles WHERE role_name = ?`,
+            //         {
+            //             replacements: [role],
+            //             type: sequelize.QueryTypes.SELECT,
+            //             transaction: t
+            //         }
+            //     )
+            //     console.log(role, roleId);
 
-                roleIds.push(roleId[0].role_id);
-            }
+            //     roleIds.push(roleId[0].role_id);
+            // }
 
             for (const roleId of roleIds) {
                 await sequelize.query(

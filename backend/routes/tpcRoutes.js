@@ -9,12 +9,17 @@ import { checkTpcRole } from "../middlewares/roleMiddleware.js";
 
 import { getSelectedCandidates, moveNextRound, rejectCandidate, selectCandidate } from "../controllers/tpcControllers/applicationController.js";
 import { addPlacementData } from "../controllers/tpcControllers/placementController.js";
+import { getApprovedCandidates, getPendingCandidates } from "../controllers/tpcControllers/userController.js";
 
 const router = express.Router();
 
 // Route to approve a pending user
 router.post("/approveUser", authMiddleware, checkTpcRole, approveUser);
 router.post("/rejectUser", authMiddleware, checkTpcRole, rejectUser);
+
+//Route for get pending and approved students 
+router.get("/get-approved-candidates", authMiddleware, checkTpcRole, getApprovedCandidates);
+router.get("/get-pending-candidates", authMiddleware, checkTpcRole, getPendingCandidates);
 
 // from company controller
 router.post('/add-company', upload.single('company_JD'), authMiddleware, checkTpcRole, addCompany);
