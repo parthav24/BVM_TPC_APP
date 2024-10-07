@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import { CommonActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TPOProfile({ navigation }) {
@@ -24,12 +23,7 @@ export default function TPOProfile({ navigation }) {
       type: 'success',
       text1: 'Logged out Successfully',
     });
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'Home' }],
-      })
-    );
+    navigation.navigate("Home");
   };
 
   return (

@@ -11,6 +11,7 @@ export default function StudentDashboard() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDrive, setSelectedDrive] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
   const [placementDrives, setPlacementDrives] = useState({
     upcoming: [],
     ongoing: [],
@@ -81,8 +82,15 @@ export default function StudentDashboard() {
 
     const meetsBacklogs = (item.max_active_backlogs === null || userData.no_active_backlog <= item.max_active_backlogs) &&
       (item.max_dead_backlogs === null || userData.no_dead_backlog <= item.max_dead_backlogs);
+    const deadlineCheck = (new Date(item.deadline) >= Date.now())
+    if (!(meetsCPI && meetsBacklogs)) {
+      setError("You are not eligible for this position")
+    }
+    else {
+      setError("Application Deadline Closed")
+    }
 
-    return meetsCPI && meetsBacklogs;
+    return (meetsCPI && meetsBacklogs && deadlineCheck);
   };
 
   const renderItem = ({ item }) => {
@@ -112,7 +120,7 @@ export default function StudentDashboard() {
               <Text style={styles.buttonText}>Apply</Text>
             </TouchableOpacity>
             {!eligibility && userData && <Text style={styles.error}>
-              You are not eligible to apply for this position.
+              {error}
             </Text>}
           </>
         )}
@@ -131,14 +139,14 @@ export default function StudentDashboard() {
       <Text style={styles.title}>Student Dashboard</Text>
 
       <View style={styles.tabContainer}>
-        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('ongoing')}>
-          <Text style={[styles.tabButtonText, selectedTab === 'ongoing' && styles.activeTab]}>Ongoing</Text>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'ongoing' && styles.activeTab]} onPress={() => setSelectedTab('ongoing')}>
+          <Text style={[styles.tabButtonText]}>Ongoing</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('upcoming')}>
-          <Text style={[styles.tabButtonText, selectedTab === 'upcoming' && styles.activeTab]}>Upcoming</Text>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'upcoming' && styles.activeTab]} onPress={() => setSelectedTab('upcoming')}>
+          <Text style={styles.tabButtonText}>Upcoming</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('completed')}>
-          <Text style={[styles.tabButtonText, selectedTab === 'completed' && styles.activeTab]}>Completed</Text>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'completed' && styles.activeTab]} onPress={() => setSelectedTab('completed')}>
+          <Text style={styles.tabButtonText}>Completed</Text>
         </TouchableOpacity>
       </View>
 
@@ -189,8 +197,6 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     backgroundColor: '#702963',
-    borderRadius: 7,
-    padding:5
   },
   list: {
     marginBottom: 20,

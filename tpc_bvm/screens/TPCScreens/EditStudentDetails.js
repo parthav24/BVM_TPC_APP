@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
 import connString from "../../components/connectionString";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -10,9 +10,10 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-
+import Toast from "react-native-toast-message";
 import { Dropdown } from "react-native-element-dropdown";
 import RadioGroup from "react-native-radio-buttons-group";
+import { useRoute } from "@react-navigation/native";
 
 const branches = [
   { label: "01-Civil Engineering", value: 1 },
@@ -28,36 +29,16 @@ const branches = [
 ];
 
 export default function EditStudentDetails({ navigation }) {
+  const route = useRoute();
   const [selectedId, setSelectedId] = useState();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    uid: "21CP037",
-    dept_id: 3,
-    f_name: "John",
-    m_name: "A.",
-    l_name: "Doe",
-    email: "john.doe@example.com",
-    mobile: "1234567890",
-    address: "123 Main St, Anytown",
-    dob: "2000-01-01",
-    gender: "male",
-    sem1: 8.0,
-    sem2: 7.5,
-    sem3: 8.2,
-    sem4: 8.5,
-    sem5: 7.8,
-    sem6: 7.9,
-    sem7: 8.1,
-    sem8: 8.3,
-    cpi: 8.0,
-    diploma_cpi: "NA",
-    hsc_percentage: 93.0,
-    ssc_percentage: 85.0,
-    passout_year: 2024,
-    no_active_backlog: 0,
-    no_dead_backlog: 0,
-  });
+  const [formData, setFormData] = useState();
+  useEffect(() => {
+    const { student } = route.params;
+    console.log(student);
+    setFormData(student)
+  }, [])
 
   const radioButtons = useMemo(
     () => [
@@ -96,35 +77,35 @@ export default function EditStudentDetails({ navigation }) {
 
     // Additional validations (optional, based on your requirements)
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (formData.email && !emailPattern.test(formData.email)) {
+    if (formData?.email && !emailPattern.test(formData?.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
     if (
-      formData.mobile &&
-      (formData.mobile.length < 10 || formData.mobile.length > 15)
+      formData?.mobile &&
+      (formData?.mobile.length < 10 || formData?.mobile.length > 15)
     ) {
       newErrors.mobile = "Mobile number must be between 10 and 15 digits";
     }
 
     const percentageFields = ["ssc_percentage", "hsc_percentage"];
     percentageFields.forEach((field) => {
-      if (formData[field] && (formData[field] < 0 || formData[field] > 100)) {
+      if (formData?.[field] && (formData?.[field] < 0 || formData?.[field] > 100)) {
         newErrors[field] = "Percentage must be between 0 and 100";
       }
     });
 
     const semesterFields = ["sem1", "sem2", "sem3", "sem4"];
     semesterFields.forEach((field) => {
-      if (formData[field] && (formData[field] < 0 || formData[field] > 10)) {
+      if (formData?.[field] && (formData?.[field] < 0 || formData?.[field] > 10)) {
         newErrors[field] = "SPI must be between 0 and 10";
       }
     });
 
-    if (formData.no_active_backlog < 0) {
+    if (formData?.no_active_backlog < 0) {
       newErrors.no_active_backlog = "Active backlogs cannot be negative";
     }
-    if (formData.no_dead_backlog < 0) {
+    if (formData?.no_dead_backlog < 0) {
       newErrors.no_dead_backlog = "Dead backlogs cannot be negative";
     }
 
@@ -138,11 +119,16 @@ export default function EditStudentDetails({ navigation }) {
         const convertedData = convertFormDataTypes(formData);
 
         const response = await axios.post(
-          `${connString}/auth/studentRegister`,
+          `${connString}/tpc/edit-candidate-details`,
           convertedData
         );
+        Toast.show({
+          type: "success",
+          text1: `Details updated successfully!`,
+        });
         console.log("API Response:", response.data);
-        navigation.navigate("SignIn");
+        navigation.navigate("TPC", { screen: "TPCHome" });
+
       } catch (error) {
         console.error("API Error:", error.response?.data || error.message);
         alert("An error occurred. Please try again."); // Notify the user of an error
@@ -152,32 +138,33 @@ export default function EditStudentDetails({ navigation }) {
 
   const convertFormDataTypes = (formData) => {
     return {
-      address: formData.address,
-      dept_id: formData.dept_id ? Number(formData.dept_id) : null,
-      diploma_cpi: formData.diploma_cpi ? Number(formData.diploma_cpi) : null,
-      dob: formData.dob,
-      email: formData.email,
-      f_name: formData.f_name,
-      gender: formData.gender,
-      hsc_percentage: formData.hsc_percentage
-        ? Number(formData.hsc_percentage)
+      uid: formData?.uid,
+      address: formData?.address,
+      dept_id: formData?.dept_id ? Number(formData?.dept_id) : null,
+      diploma_cpi: formData?.diploma_cpi ? Number(formData?.diploma_cpi) : null,
+      dob: formData?.dob,
+      email: formData?.email,
+      f_name: formData?.f_name,
+      gender: formData?.gender,
+      hsc_percentage: formData?.hsc_percentage
+        ? Number(formData?.hsc_percentage)
         : null,
-      l_name: formData.l_name,
-      m_name: formData.m_name,
-      mobile: formData.mobile,
-      no_active_backlog: formData.no_active_backlog || 0,
-      no_dead_backlog: formData.no_dead_backlog || 0,
-      passout_year: Number(formData.passout_year),
-      sem1: formData.sem1 ? Number(formData.sem1) : null,
-      sem2: formData.sem2 ? Number(formData.sem2) : null,
-      sem3: formData.sem3 ? Number(formData.sem3) : null,
-      sem4: formData.sem4 ? Number(formData.sem4) : null,
-      sem5: formData.sem5 ? Number(formData.sem5) : null,
-      sem6: formData.sem6 ? Number(formData.sem6) : null,
-      sem7: formData.sem7 ? Number(formData.sem7) : null,
-      sem8: formData.sem8 ? Number(formData.sem8) : null,
-      ssc_percentage: formData.ssc_percentage
-        ? Number(formData.ssc_percentage)
+      l_name: formData?.l_name,
+      m_name: formData?.m_name,
+      mobile: formData?.mobile,
+      no_active_backlog: formData?.no_active_backlog || 0,
+      no_dead_backlog: formData?.no_dead_backlog || 0,
+      passout_year: Number(formData?.passout_year),
+      sem1: formData?.sem1 ? Number(formData?.sem1) : null,
+      sem2: formData?.sem2 ? Number(formData?.sem2) : null,
+      sem3: formData?.sem3 ? Number(formData?.sem3) : null,
+      sem4: formData?.sem4 ? Number(formData?.sem4) : null,
+      sem5: formData?.sem5 ? Number(formData?.sem5) : null,
+      sem6: formData?.sem6 ? Number(formData?.sem6) : null,
+      sem7: formData?.sem7 ? Number(formData?.sem7) : null,
+      sem8: formData?.sem8 ? Number(formData?.sem8) : null,
+      ssc_percentage: formData?.ssc_percentage
+        ? Number(formData?.ssc_percentage)
         : null,
     };
   };
@@ -189,7 +176,7 @@ export default function EditStudentDetails({ navigation }) {
       <Text style={styles.label}>Student ID (Ex. 21CP037)</Text>
       <TextInput
         style={styles.input}
-        value={formData.uid}
+        value={formData?.uid}
         onChangeText={(value) => handleChange("uid", value)}
         editable={false} // Assuming Student ID should not be editable
       />
@@ -204,35 +191,35 @@ export default function EditStudentDetails({ navigation }) {
         labelField="label"
         valueField="value"
         placeholder="Select Department"
-        value={formData.dept_id}
+        value={formData?.dept_id}
         onChange={(item) => handleChange("dept_id", item.value)}
       />
 
       <Text style={styles.label}>First Name</Text>
       <TextInput
         style={styles.input}
-        value={formData.f_name}
+        value={formData?.f_name}
         onChangeText={(value) => handleChange("f_name", value)}
       />
 
       <Text style={styles.label}>Middle Name</Text>
       <TextInput
         style={styles.input}
-        value={formData.m_name}
+        value={formData?.m_name}
         onChangeText={(value) => handleChange("m_name", value)}
       />
 
       <Text style={styles.label}>Last Name</Text>
       <TextInput
         style={styles.input}
-        value={formData.l_name}
+        value={formData?.l_name}
         onChangeText={(value) => handleChange("l_name", value)}
       />
 
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
-        value={formData.email}
+        value={formData?.email}
         onChangeText={(value) => handleChange("email", value)}
       />
       {errors.email && <Text style={styles.error}>{errors.email}</Text>}
@@ -240,7 +227,7 @@ export default function EditStudentDetails({ navigation }) {
       <Text style={styles.label}>Mobile Number</Text>
       <TextInput
         style={styles.input}
-        value={formData.mobile}
+        value={formData?.mobile}
         onChangeText={(value) => handleChange("mobile", value)}
       />
       {errors.mobile && <Text style={styles.error}>{errors.mobile}</Text>}
@@ -248,13 +235,13 @@ export default function EditStudentDetails({ navigation }) {
       <Text style={styles.label}>Address</Text>
       <TextInput
         style={styles.input}
-        value={formData.address}
+        value={formData?.address}
         onChangeText={(value) => handleChange("address", value)}
       />
 
       <Text style={styles.label}>Date of Birth</Text>
       <TouchableOpacity onPress={showDatePicker} style={styles.datePicker}>
-        <Text>{formData.dob}</Text>
+        <Text>{formData?.dob}</Text>
       </TouchableOpacity>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
@@ -276,7 +263,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 1</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem1?.toString()}
+            value={formData?.sem1?.toString()}
             onChangeText={(value) => handleChange("sem1", value)}
             keyboardType="numeric"
           />
@@ -285,7 +272,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 2</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem2?.toString()}
+            value={formData?.sem2?.toString()}
             onChangeText={(value) => handleChange("sem2", value)}
             keyboardType="numeric"
           />
@@ -294,7 +281,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 3</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem3?.toString()}
+            value={formData?.sem3?.toString()}
             onChangeText={(value) => handleChange("sem3", value)}
             keyboardType="numeric"
           />
@@ -303,7 +290,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 4</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem4?.toString()}
+            value={formData?.sem4?.toString()}
             onChangeText={(value) => handleChange("sem4", value)}
             keyboardType="numeric"
           />
@@ -315,7 +302,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 5</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem5?.toString()}
+            value={formData?.sem5?.toString()}
             onChangeText={(value) => handleChange("sem5", value)}
             keyboardType="numeric"
           />
@@ -324,7 +311,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 6</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem6?.toString()}
+            value={formData?.sem6?.toString()}
             onChangeText={(value) => handleChange("sem6", value)}
             keyboardType="numeric"
           />
@@ -333,7 +320,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 7</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem7?.toString()}
+            value={formData?.sem7?.toString()}
             onChangeText={(value) => handleChange("sem7", value)}
             keyboardType="numeric"
           />
@@ -342,7 +329,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Sem 8</Text>
           <TextInput
             style={styles.spiInput}
-            value={formData.sem8?.toString()}
+            value={formData?.sem8?.toString()}
             onChangeText={(value) => handleChange("sem8", value)}
             keyboardType="numeric"
           />
@@ -354,7 +341,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Overall  CPI</Text>
           <TextInput
             style={styles.input}
-            value={formData.cpi?.toString()}
+            value={formData?.cpi?.toString()}
             onChangeText={(value) => handleChange("cpi", value)}
             keyboardType="numeric"
           />
@@ -363,7 +350,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>Diploma CPI</Text>
           <TextInput
             style={styles.input}
-            value={formData.diploma_cpi}
+            value={formData?.diploma_cpi}
             onChangeText={(value) => handleChange("diploma_cpi", value)}
           />
         </View>
@@ -371,7 +358,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>HSC Percentage</Text>
           <TextInput
             style={styles.input}
-            value={formData.hsc_percentage?.toString()}
+            value={formData?.hsc_percentage?.toString()}
             onChangeText={(value) => handleChange("hsc_percentage", value)}
             keyboardType="numeric"
           />
@@ -383,7 +370,7 @@ export default function EditStudentDetails({ navigation }) {
           <Text style={styles.label}>SSC Percentage</Text>
           <TextInput
             style={styles.input}
-            value={formData.ssc_percentage?.toString()}
+            value={formData?.ssc_percentage?.toString()}
             onChangeText={(value) => handleChange("ssc_percentage", value)}
             keyboardType="numeric"
           />
@@ -395,7 +382,7 @@ export default function EditStudentDetails({ navigation }) {
       <Text style={styles.label}>Passout Year</Text>
       <TextInput
         style={styles.input}
-        value={formData.passout_year?.toString()}
+        value={formData?.passout_year?.toString()}
         onChangeText={(value) => handleChange("passout_year", value)}
         keyboardType="numeric"
       />
@@ -403,7 +390,7 @@ export default function EditStudentDetails({ navigation }) {
       <Text style={styles.label}>Number of Active Backlogs</Text>
       <TextInput
         style={styles.input}
-        value={formData.no_active_backlog?.toString()}
+        value={formData?.no_active_backlog?.toString()}
         onChangeText={(value) => handleChange("no_active_backlog", value)}
         keyboardType="numeric"
       />
@@ -414,7 +401,7 @@ export default function EditStudentDetails({ navigation }) {
       <Text style={styles.label}>Number of Dead Backlogs</Text>
       <TextInput
         style={styles.input}
-        value={formData.no_dead_backlog?.toString()}
+        value={formData?.no_dead_backlog?.toString()}
         onChangeText={(value) => handleChange("no_dead_backlog", value)}
         keyboardType="numeric"
       />
