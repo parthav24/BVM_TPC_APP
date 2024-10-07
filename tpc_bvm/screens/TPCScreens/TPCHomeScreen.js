@@ -11,7 +11,7 @@ import {
   FlatList,
 } from "react-native";
 
-export default function TPCHomeScreen() {
+export default function TPCHomeScreen({navigation}) {
   const [userData, setUserData] = useState(null);
   // const [students, setStudents] = useState({
   //   approvedStudents: [{ "address": "Surat", "cpi": 8.4, "createdAt": "2024-09-29T08:56:25.000Z", "dept_id": 3, "diploma_cpi": 0, "dob": "2003-04-08", "email": "italiyadhruv09@gmail.com", "f_name": "Dhruv", "gender": "male", "hsc_percentage": 99.2, "id": "21CP029", "l_name": "Italiya", "m_name": "Narshibhai", "mobile": "9714189489", "no_active_backlog": 0, "no_dead_backlog": 0, "passout_year": 2025, "password": "$2b$10$N/BR7UJdDqifS/f4lunWzOEF7Jy/8QqJ7HzN7e/yQNMs6yTg0JigO", "role": "student", "sem1": 8.4, "sem2": 8.4, "sem3": 8.4, "sem4": 8.4, "sem5": 0, "sem6": 0, "sem7": 0, "sem8": 0, "ssc_percentage": 98.4, "uid": "21CP029" }],
@@ -148,6 +148,7 @@ export default function TPCHomeScreen() {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         selectedTab={selectedTab}
+        navigation={navigation}
       />
     </View>
   );

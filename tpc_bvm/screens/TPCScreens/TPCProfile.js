@@ -1,9 +1,15 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast from 'react-native-toast-message';
-import { CommonActions } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+import { CommonActions } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TPCProfile({ navigation }) {
   // Mock data, replace with real data
@@ -12,22 +18,32 @@ export default function TPCProfile({ navigation }) {
     branch: "Electronics and Communication",
     currentTPO: "Mr. Sharma",
     members: [
-      { name: "Bob Brown", branch: "CSE", email: "bob@example.com", phone: "1234567890" },
-      { name: "Charlie White", branch: "Mechanical", email: "charlie@example.com", phone: "0987654321" },
+      {
+        name: "Bob Brown",
+        branch: "CSE",
+        email: "bob@example.com",
+        phone: "1234567890",
+      },
+      {
+        name: "Charlie White",
+        branch: "Mechanical",
+        email: "charlie@example.com",
+        phone: "0987654321",
+      },
     ],
   };
 
   const handleLogout = () => {
-    AsyncStorage.removeItem('userData');
-    AsyncStorage.removeItem('authToken');
+    AsyncStorage.removeItem("userData");
+    AsyncStorage.removeItem("authToken");
     Toast.show({
-      type: 'success',
-      text1: 'Logged out Successfully',
+      type: "success",
+      text1: "Logged out Successfully",
     });
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'SignIn' }],
+        routes: [{ name: "Home" }],
       })
     );
   };
@@ -37,19 +53,19 @@ export default function TPCProfile({ navigation }) {
       <View style={styles.card}>
         <Text style={styles.title}>TPC Profile</Text>
         <Text style={styles.label}>
-          <Ionicons name="person-outline" size={18} color="#007bff" />
-          {" "}Name: <Text style={styles.value}>{tpcDetails.name}</Text>
+          <Ionicons name="person-outline" size={18} color="#007bff" /> Name:{" "}
+          <Text style={styles.value}>{tpcDetails.name}</Text>
         </Text>
         <Text style={styles.label}>
-          <Ionicons name="book-outline" size={18} color="#007bff" />
-          {" "}Branch: <Text style={styles.value}>{tpcDetails.branch}</Text>
+          <Ionicons name="book-outline" size={18} color="#007bff" /> Branch:{" "}
+          <Text style={styles.value}>{tpcDetails.branch}</Text>
         </Text>
         <Text style={styles.label}>
-          <Ionicons name="people-outline" size={18} color="#007bff" />
-          {" "}Current TPO: <Text style={styles.value}>{tpcDetails.currentTPO}</Text>
+          <Ionicons name="people-outline" size={18} color="#007bff" /> Current
+          TPO: <Text style={styles.value}>{tpcDetails.currentTPO}</Text>
         </Text>
       </View>
-      
+
       <View style={styles.card}>
         <Text style={styles.subTitle}>Members:</Text>
         {tpcDetails.members.map((member, index) => (
@@ -62,6 +78,13 @@ export default function TPCProfile({ navigation }) {
         ))}
       </View>
 
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Statistics")}
+      >
+        <Text style={styles.buttonText}>Placement Statistics</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
@@ -72,14 +95,14 @@ export default function TPCProfile({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -90,30 +113,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   subTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#007bff',
+    color: "#007bff",
   },
   label: {
     fontSize: 16,
     marginVertical: 5,
-    color: '#555',
+    color: "#555",
   },
   value: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   memberContainer: {
     padding: 10,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     marginVertical: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -123,15 +146,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   memberName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     paddingVertical: 12,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
-    width: '100%',
+    width: "100%",
   },
   logoutButton: {
     backgroundColor: "#dc3545",
@@ -139,11 +162,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginBottom: 10,
-    width: "100%"
+    width: "100%",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
