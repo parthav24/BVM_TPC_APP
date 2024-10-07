@@ -43,6 +43,7 @@ export default function SignInScreen({ navigation }) {
     try {
       // Reset errors
       setErrors({});
+      console.log(errors);
 
       const response = await axios.post(`${connString}/auth/login`, {
         uid,
@@ -61,10 +62,22 @@ export default function SignInScreen({ navigation }) {
 
       // Navigate based on role or screen (adjust as per your app)
       if (role === "student") {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Student' }],
+        });
         navigation.navigate("Student", { screen: "Dashboard" });
       } else if (role === "tpc") {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'TPC' }],
+        });
         navigation.navigate("TPC", { screen: "TPCHome" });
       } else if (role === "tpo") {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'TPO' }],
+        });
         navigation.navigate("TPO", { screen: "TPOHome" });
       }
     } catch (error) {
@@ -98,7 +111,7 @@ export default function SignInScreen({ navigation }) {
           <Picker.Item label="TPO" value="tpo" />
         </Picker>
       </View>
-      {errors.role && <Text style={styles.errorText}>{errors.role}</Text>}
+      {/* {errors && errors?.role && <Text style={styles.errorText}>{errors?.role}</Text>} */}
 
       {/* User ID Input */}
       <TextInput
