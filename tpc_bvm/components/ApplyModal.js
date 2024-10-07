@@ -32,8 +32,8 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
     }, [selectedDrive]);
 
     const handleRoleSelect = (role_id) => {
-        if (selectedRoles.includes(role_id)) {
-            setSelectedRoles(selectedRoles.filter((r) => r !== role_id));
+        if (selectedRoles?.includes(role_id)) {
+            setSelectedRoles(selectedRoles?.filter((r) => r !== role_id));
         } else {
             setSelectedRoles([...selectedRoles, role_id]);
         }
@@ -89,12 +89,12 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Apply for {selectedDrive?.name}</Text>
                     {/* Role Selection */}
-                    {selectedDrive.role && <Text style={styles.modalText}>Select Roles:</Text>}
+                    {selectedDrive?.role && <Text style={styles.modalText}>Select Roles:</Text>}
                     <ScrollView style={styles.rolesContainer}>
                         {roles.map((role) => (
                             <View key={role.id}>
                                 <CheckBox
-                                    isChecked={selectedRoles.includes(role.role_id)}
+                                    isChecked={selectedRoles?.includes(role.role_id)}
                                     rightText={role.role_name}
                                     onClick={() => handleRoleSelect(role.role_id)}
                                 />

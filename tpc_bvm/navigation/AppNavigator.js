@@ -12,7 +12,7 @@ import PlacementStatistics from '../screens/PlacementStatistics';
 const Stack = createStackNavigator();
 
 function AppNavigator() {
-  const userRole = 'student'
+  const userRole = "student" ;
   return (
     <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
@@ -20,10 +20,9 @@ function AppNavigator() {
       <Stack.Screen name="Guest" component={GuestScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="Statistics" component={PlacementStatistics} />
-
-      {userRole === 'student' && <Stack.Screen name="Student" component={StudentNavigator} options={{ headerShown: false }} />}
-      {userRole === 'tpc' && <Stack.Screen name="TPC" component={TPCNavigator} options={{ headerShown: false }} />}
-      {userRole === 'tpo' && <Stack.Screen name="TPO" component={TPONavigator} options={{ headerShown: false }} />}
+      <Stack.Screen name="Student" component={StudentNavigator} options={{ headerShown: false }} />
+      <Stack.Screen name="TPC" component={TPCNavigator} options={{ headerShown: false }} />
+      <Stack.Screen name="TPO" component={TPONavigator} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
