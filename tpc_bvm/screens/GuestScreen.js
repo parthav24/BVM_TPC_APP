@@ -20,11 +20,7 @@ export default function GuestScreen({ navigation }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("Hii");
-        const { data } = await axios.get(
-          `${connString}/guest/get-placement-data`
-        );
-        console.log("sir ");
+        const { data } = await axios.get(`${connString}/guest/get-placement-data`);
         const dataWithSrNo = data.placement_data.map((student, idx) => ({
           ...student,
           srNo: idx + 1,
@@ -39,7 +35,6 @@ export default function GuestScreen({ navigation }) {
       }
     };
     fetchData();
-    console.log("hello");
   }, []);
 
   const handleOfferLetterClick = () => {

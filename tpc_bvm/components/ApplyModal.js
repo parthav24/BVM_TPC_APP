@@ -92,7 +92,7 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
                     {selectedDrive?.role && <Text style={styles.modalText}>Select Roles:</Text>}
                     <ScrollView style={styles.rolesContainer}>
                         {roles.map((role) => (
-                            <View key={role.id}>
+                            <View key={role.role_id}>
                                 <CheckBox
                                     isChecked={selectedRoles?.includes(role.role_id)}
                                     rightText={role.role_name}
