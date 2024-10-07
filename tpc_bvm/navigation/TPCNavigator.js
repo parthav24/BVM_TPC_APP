@@ -3,7 +3,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { TouchableOpacity, Image } from 'react-native';
 import TPCDashboard from '../screens/TPCScreens/TPCDashboard';
 import TPCHomeScreen from '../screens/TPCScreens/TPCHomeScreen';
-import TPCProfile from '../screens/TPCScreens/TPCProfile'; // Import TPC Profile screen
+import TPCProfile from '../screens/TPCScreens/TPCProfile';
+import EditStudentDetails from '../screens/TPCScreens/EditStudentDetails';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ function TPCNavigator({ navigation }) {
       />
       <Stack.Screen name="TPCProfile" component={TPCProfile} />
       <Stack.Screen name="Dashboard" component={TPCDashboard} />
+      <Stack.Screen name="EditStudentDetails" component={EditStudentDetails} />
     </Stack.Navigator>
   );
 }
