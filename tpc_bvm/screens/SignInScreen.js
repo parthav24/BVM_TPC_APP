@@ -104,19 +104,20 @@ export default function SignInScreen({ navigation }) {
         <Picker
           selectedValue={role}
           onValueChange={(itemValue) => setRole(itemValue)}
+          style={styles.picker}
         >
           <Picker.Item label="Select your role" value="" />
           <Picker.Item label="Student" value="student" />
           <Picker.Item label="TPC" value="tpc" />
           <Picker.Item label="TPO" value="tpo" />
         </Picker>
+        {errors.role && <Text style={styles.errorText}>{errors.role}</Text>}
       </View>
-      {/* {errors && errors?.role && <Text style={styles.errorText}>{errors?.role}</Text>} */}
 
       {/* User ID Input */}
       <TextInput
         style={styles.input}
-        placeholder="UserId"
+        placeholder="User ID"
         value={uid}
         onChangeText={(text) => setUid(text)}
       />
@@ -139,26 +140,6 @@ export default function SignInScreen({ navigation }) {
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
 
-      {/* Other buttons (optional navigation) */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Student", { screen: "Dashboard" })}
-      >
-        <Text style={styles.buttonText}>Student Dashboard</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Statistics")}
-      >
-        <Text style={styles.buttonText}>Placement Statistics</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Admin")}
-      >
-        <Text style={styles.buttonText}>TPC Dashboard</Text>
-      </TouchableOpacity>
-
       {/* Sign-Up Link */}
       <TouchableOpacity
         style={styles.signUpButton}
@@ -179,9 +160,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 40,
+    color: "#007bff",
   },
   input: {
     width: "100%",
@@ -198,6 +180,9 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginBottom: 10,
     padding: 2,
+  },
+  picker: {
+    height: 50,
   },
   button: {
     backgroundColor: "#007bff",
@@ -224,5 +209,6 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginBottom: 10,
+    marginLeft:15
   },
 });
