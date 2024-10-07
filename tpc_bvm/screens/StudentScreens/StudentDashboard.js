@@ -1,17 +1,16 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput, Button } from 'react-native';
 import connString from '../../components/connectionString';
 import ApplyModal from '../../components/ApplyModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../../Contexts/UserContext';
 
 export default function StudentDashboard() {
   const [selectedTab, setSelectedTab] = useState('upcoming');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDrive, setSelectedDrive] = useState(null);
-  const [appliedDrives, setAppliedDrives] = useState([]);
   const [userData, setUserData] = useState(null);
-  const [application,setApplication] = useState({});
   const [placementDrives, setPlacementDrives] = useState({
     upcoming: [],
     ongoing: [],
@@ -21,13 +20,6 @@ export default function StudentDashboard() {
   const handleApply = (drive) => {
     setSelectedDrive(drive);
     setModalVisible(true);
-  };
-
-  const handleApplySubmit = () => {
-    if (selectedDrive) {
-      setAppliedDrives([...appliedDrives, selectedDrive.id]);
-      setModalVisible(false);
-    }
   };
 
   const handleDate = (date) => {
@@ -83,8 +75,7 @@ export default function StudentDashboard() {
           ongoing,
           completed,
         });
-
-        setUserData(JSON.parse(await AsyncStorage.getItem('userData')));
+        setUserData(JSON.parse(await AsyncStorage.getItem('userData')))
       } catch (error) {
         console.error('Company data fetch failed:', error.response ? error.response.data : error.message);
       }
@@ -162,10 +153,10 @@ export default function StudentDashboard() {
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Resource Center</Text>
       </TouchableOpacity>
-      <ApplyModal 
-        modalVisible={modalVisible} 
-        setModalVisible={setModalVisible} 
-        selectedDrive={selectedDrive} 
+      <ApplyModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        selectedDrive={selectedDrive}
       />
     </View>
   );
