@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { CommonActions } from "@react-navigation/native";
@@ -37,7 +38,11 @@ export default function StudentProfile({ navigation }) {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "SignIn" }],
+<<<<<<< Updated upstream
+        routes: [{ name: "Home" }],
+=======
+        routes: [{ name: "Home" }], // Redirect to the 'Home' screen or login screen
+>>>>>>> Stashed changes
       })
     );
   };

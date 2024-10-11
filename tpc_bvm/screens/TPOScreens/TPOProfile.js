@@ -1,9 +1,24 @@
+<<<<<<< Updated upstream
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { CommonActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+=======
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+import { CommonActions } from '@react-navigation/native';
+import { Ionicons } from "@expo/vector-icons";
+>>>>>>> Stashed changes
 
 export default function TPOProfile({ navigation }) {
   // Mock data, replace with real data
@@ -18,16 +33,20 @@ export default function TPOProfile({ navigation }) {
   };
 
   const handleLogout = () => {
-    AsyncStorage.removeItem('userData');
-    AsyncStorage.removeItem('authToken');
+    AsyncStorage.removeItem("userData");
+    AsyncStorage.removeItem("authToken");
     Toast.show({
-      type: 'success',
-      text1: 'Logged out Successfully',
+      type: "success",
+      text1: "Logged out Successfully",
     });
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'SignIn' }],
+<<<<<<< Updated upstream
+        routes: [{ name: 'Home' }],
+=======
+        routes: [{ name: "Home" }],
+>>>>>>> Stashed changes
       })
     );
   };
@@ -37,16 +56,18 @@ export default function TPOProfile({ navigation }) {
       <View style={styles.card}>
         <Text style={styles.title}>TPO Profile</Text>
         <Text style={styles.label}>
-          <Ionicons name="person-outline" size={18} color="#007bff" />
-          {" "}Name: <Text style={styles.value}>{tpoDetails.name}</Text>
+          <Ionicons name="person-outline" size={18} color="#007bff" /> Name:{" "}
+          <Text style={styles.value}>{tpoDetails.name}</Text>
         </Text>
         <Text style={styles.label}>
-          <Ionicons name="business-outline" size={18} color="#007bff" />
-          {" "}Total Companies Arrived: <Text style={styles.value}>{tpoDetails.totalCompanies}</Text>
+          <Ionicons name="business-outline" size={18} color="#007bff" /> Total
+          Companies Arrived:{" "}
+          <Text style={styles.value}>{tpoDetails.totalCompanies}</Text>
         </Text>
         <Text style={styles.label}>
-          <Ionicons name="people-outline" size={18} color="#007bff" />
-          {" "}Total Students Placed: <Text style={styles.value}>{tpoDetails.totalStudentsPlaced}</Text>
+          <Ionicons name="people-outline" size={18} color="#007bff" /> Total
+          Students Placed:{" "}
+          <Text style={styles.value}>{tpoDetails.totalStudentsPlaced}</Text>
         </Text>
       </View>
 
@@ -70,14 +91,14 @@ export default function TPOProfile({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -88,30 +109,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   subTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#007bff',
+    color: "#007bff",
   },
   label: {
     fontSize: 16,
     marginVertical: 5,
-    color: '#555',
+    color: "#555",
   },
   value: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   memberContainer: {
     padding: 10,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     marginVertical: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -121,15 +142,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   memberName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     paddingVertical: 12,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
-    width: '100%',
+    width: "100%",
   },
   logoutButton: {
     backgroundColor: "#dc3545",
@@ -137,11 +158,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginBottom: 10,
-    width: "100%"
+    width: "100%",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
