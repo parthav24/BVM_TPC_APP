@@ -3,8 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 export default function TPCHomeScreen({navigation}) {
+=======
+export default function TPCHomeScreen({ navigation }) {
+>>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
   const [userData, setUserData] = useState(null);
   // const [students, setStudents] = useState({
   //   approvedStudents: [{ "address": "Surat", "cpi": 8.4, "createdAt": "2024-09-29T08:56:25.000Z", "dept_id": 3, "diploma_cpi": 0, "dob": "2003-04-08", "email": "italiyadhruv09@gmail.com", "f_name": "Dhruv", "gender": "male", "hsc_percentage": 99.2, "id": "21CP029", "l_name": "Italiya", "m_name": "Narshibhai", "mobile": "9714189489", "no_active_backlog": 0, "no_dead_backlog": 0, "passout_year": 2025, "password": "$2b$10$N/BR7UJdDqifS/f4lunWzOEF7Jy/8QqJ7HzN7e/yQNMs6yTg0JigO", "role": "student", "sem1": 8.4, "sem2": 8.4, "sem3": 8.4, "sem4": 8.4, "sem5": 0, "sem6": 0, "sem7": 0, "sem8": 0, "ssc_percentage": 98.4, "uid": "21CP029" }],
@@ -18,31 +22,9 @@ export default function TPCHomeScreen({navigation}) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-
-  const approveStudent = (id) => {
-    setStudents((prevStudents) =>
-      prevStudents.map((student) =>
-        student.id === id ? { ...student, status: "approved" } : student
-      )
-    );
-  };
-
-  const rejectStudent = (id) => {
-    setStudents((prevStudents) =>
-      prevStudents.map((student) =>
-        student.id === id ? { ...student, status: "rejected" } : student
-      )
-    );
-  };
-
   const handleViewClick = (uid) => {
-    console.log(uid);
-
     if (selectedTab === 'pending') {
-
       setSelectedUser(students.pendingStudents.find((student) => student.uid == uid));
-      console.log(selectedUser);
-
     }
     else {
       setSelectedUser(students.approvedStudents.find((student) => student.uid == uid));
@@ -54,10 +36,8 @@ export default function TPCHomeScreen({navigation}) {
     const fetchApprovedCandidates = async () => {
       try {
         const response = await axios.get(`${connString}/tpc/get-approved-candidates`)
-        console.log(response.data);
         setUserData(JSON.parse(await AsyncStorage.getItem('userData')))
         setStudents((prev) => ({ ...prev, approvedStudents: response.data.approved_students }))
-
       } catch (error) {
         console.error('Approved students fetch failed:', error.response ? error.response.data : error.message);
       }
@@ -65,7 +45,6 @@ export default function TPCHomeScreen({navigation}) {
     const fetchPendingCandidates = async () => {
       try {
         const response = await axios.get(`${connString}/tpc/get-pending-candidates`)
-        console.log(response.data);
         setUserData(JSON.parse(await AsyncStorage.getItem('userData')))
         setStudents((prev) => ({ ...prev, pendingStudents: response.data.pending_students }))
       } catch (error) {
@@ -74,11 +53,15 @@ export default function TPCHomeScreen({navigation}) {
     }
     fetchApprovedCandidates()
     fetchPendingCandidates();
+<<<<<<< HEAD
   }, [])
 =======
 const TPCHomeScreen = () => {
   const navigation = useNavigation();
 >>>>>>> Stashed changes
+=======
+  }, [modalVisible])
+>>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
 
   const handleNavigate = (screenName) => {
     navigation.navigate(screenName);
@@ -113,11 +96,11 @@ const TPCHomeScreen = () => {
           <View style={styles.studentItem}>
             <View style={{ flexDirection: "row" }}>
               <Text style={styles.studentText}>ID : </Text>
-              <Text style={{fontWeight:"bold"}}>{item.uid} </Text>
+              <Text style={{ fontWeight: "bold" }}>{item.uid} </Text>
             </View>
             <View style={{ flexDirection: "row" }}>
-            <Text style={styles.studentText}>Name : </Text>
-            <Text style={{fontWeight:"bold"}}>{item.f_name} {item.l_name}</Text>
+              <Text style={styles.studentText}>Name : </Text>
+              <Text style={{ fontWeight: "bold" }}>{item.f_name} {item.l_name}</Text>
             </View>
             <View style={{ flexDirection: "row" }}>
               <Text style={styles.studentText}>Status: </Text>
@@ -139,8 +122,21 @@ const TPCHomeScreen = () => {
         keyExtractor={(item, idx) => idx}
         renderItem={({ item }) => (
           <View style={styles.studentItem}>
-            <Text style={styles.studentText}>{item.f_name} {item.l_name}</Text>
-            <Text style={styles.studentText}>Status: Pending</Text>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.studentText}>ID : </Text>
+              <Text style={{ fontWeight: "bold" }}>{item.uid} </Text>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.studentText}>Name : </Text>
+              <Text style={{ fontWeight: "bold" }}>{item.f_name} {item.l_name}</Text>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.studentText}>Status: </Text>
+              <Text style={{
+                color: "#e1ad01",
+                fontWeight: "bold"
+              }}>Pending</Text>
+            </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.viewButton}
@@ -152,11 +148,8 @@ const TPCHomeScreen = () => {
           </View>
         )}
       />}
-
       <DisplayStudent
         student={selectedUser}
-        approveStudent={approveStudent}
-        rejectStudent={rejectStudent}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         selectedTab={selectedTab}
