@@ -1,14 +1,17 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import connString from "../../components/connectionString";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DisplayStudent from '../../components/DisplayStudent';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+} from "react-native";
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-export default function TPCHomeScreen({navigation}) {
-=======
-export default function TPCHomeScreen({ navigation }) {
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
+export default function StudentApplications({ navigation }) {
   const [userData, setUserData] = useState(null);
   // const [students, setStudents] = useState({
   //   approvedStudents: [{ "address": "Surat", "cpi": 8.4, "createdAt": "2024-09-29T08:56:25.000Z", "dept_id": 3, "diploma_cpi": 0, "dob": "2003-04-08", "email": "italiyadhruv09@gmail.com", "f_name": "Dhruv", "gender": "male", "hsc_percentage": 99.2, "id": "21CP029", "l_name": "Italiya", "m_name": "Narshibhai", "mobile": "9714189489", "no_active_backlog": 0, "no_dead_backlog": 0, "passout_year": 2025, "password": "$2b$10$N/BR7UJdDqifS/f4lunWzOEF7Jy/8QqJ7HzN7e/yQNMs6yTg0JigO", "role": "student", "sem1": 8.4, "sem2": 8.4, "sem3": 8.4, "sem4": 8.4, "sem5": 0, "sem6": 0, "sem7": 0, "sem8": 0, "ssc_percentage": 98.4, "uid": "21CP029" }],
@@ -53,42 +56,19 @@ export default function TPCHomeScreen({ navigation }) {
     }
     fetchApprovedCandidates()
     fetchPendingCandidates();
-<<<<<<< HEAD
-  }, [])
-=======
-const TPCHomeScreen = () => {
-  const navigation = useNavigation();
->>>>>>> Stashed changes
-=======
   }, [modalVisible])
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
 
-  const handleNavigate = (screenName) => {
-    navigation.navigate(screenName);
-  };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.optionsContainer}>
-        {/* Student Applications */}
-        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('Student Applications')}>
-          <Ionicons name="document-text-outline" size={40} color="#4A90E2" />
-          <Text style={styles.optionText}>Student Applications</Text>
+    <View style={styles.container}>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('pending')}>
+          <Text style={styles.tabButtonText}>Pending</Text>
         </TouchableOpacity>
-
-        {/* Add Company */}
-        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('Add Company Details')}>
-          <Ionicons name="business-outline" size={40} color="#4A90E2" />
-          <Text style={styles.optionText}>Add Company</Text>
-        </TouchableOpacity>
-
-        {/* Ongoing Drives */}
-        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('OngoingDrivesScreen')}>
-          <Ionicons name="play-outline" size={40} color="#4A90E2" />
-          <Text style={styles.optionText}>Ongoing Drives</Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('approved')}>
+          <Text style={styles.tabButtonText}>Approved</Text>
         </TouchableOpacity>
       </View>
-<<<<<<< Updated upstream
       {selectedTab == 'approved' && <FlatList
         data={students.approvedStudents}
         keyExtractor={(item, idx) => idx}
@@ -156,33 +136,72 @@ const TPCHomeScreen = () => {
         navigation={navigation}
       />
     </View>
-=======
-    </ScrollView>
->>>>>>> Stashed changes
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f7f7f7',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 16,
   },
-  optionsContainer: {
+  tabContainer: {
+    display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginBottom: 20,
   },
-  option: {
+  tabButton: {
+    flex: 1,
     alignItems: 'center',
-    width: '30%',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    backgroundColor: '#841584',
   },
-  optionText: {
-    marginTop: 10,
+  tabButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center',
-    color: '#333',
+  },
+  approvedText: {
+    color: "green",
+    fontWeight: "bold"
+  },
+  pendingText: {
+    color: "yellow",
+    fontWeight: "bold"
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  studentItem: {
+    padding: 10,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 5,
+    marginVertical: 5,
+    width: 300,
+
+  },
+  studentText: {
+    fontSize: 16,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  viewButton: {
+    backgroundColor: "green",
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
-
-export default TPCHomeScreen;

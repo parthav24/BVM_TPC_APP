@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,7 +34,20 @@ export default function StudentProfile({ navigation }) {
       type: "success",
       text1: "Logged out Successfully",
     });
+<<<<<<< HEAD
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+<<<<<<< Updated upstream
+        routes: [{ name: "Home" }],
+=======
+        routes: [{ name: "Home" }], // Redirect to the 'Home' screen or login screen
+>>>>>>> Stashed changes
+      })
+    );
+=======
     navigation.navigate("Home");
+>>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
   };
 
   return (

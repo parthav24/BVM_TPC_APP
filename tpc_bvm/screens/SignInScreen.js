@@ -72,13 +72,13 @@ export default function SignInScreen({ navigation }) {
           index: 0,
           routes: [{ name: 'TPC' }],
         });
-        navigation.navigate("TPC", { screen: "TPCHome" });
+        navigation.navigate("TPC", { screen: "Home" });
       } else if (role === "tpo") {
         navigation.reset({
           index: 0,
           routes: [{ name: 'TPO' }],
         });
-        navigation.navigate("TPO", { screen: "TPOHome" });
+        navigation.navigate("TPO", { screen: "Home" });
       }
     } catch (error) {
       // Backend error handling

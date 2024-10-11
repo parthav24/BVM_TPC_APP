@@ -8,9 +8,9 @@ const Stack = createStackNavigator();
 
 function TPONavigator({ navigation }) {
   return (
-    <Stack.Navigator initialRouteName="TPOHome">
+    <Stack.Navigator initialRouteName="Home">
       <Stack.Screen
-        name="TPOHome"
+        name="Home"
         component={TPOHomeScreen}
         options={{
           headerRight: () => (
