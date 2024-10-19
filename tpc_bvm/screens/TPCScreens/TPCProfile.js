@@ -1,28 +1,9 @@
-<<<<<<< HEAD
-import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-<<<<<<< Updated upstream
-import Toast from "react-native-toast-message";
-import { CommonActions } from "@react-navigation/native";
-=======
 import { CommonActions } from '@react-navigation/native';
-import Toast from "react-native-toast-message";
->>>>>>> Stashed changes
-import { Ionicons } from "@expo/vector-icons";
-=======
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
 
 export default function TPCProfile({ navigation }) {
   // Mock data, replace with real data
@@ -53,20 +34,12 @@ export default function TPCProfile({ navigation }) {
       type: "success",
       text1: "Logged out Successfully",
     });
-<<<<<<< HEAD
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-<<<<<<< Updated upstream
-        routes: [{ name: "Home" }],
-=======
-        routes: [{ name: "Home" }], // Redirect to the 'Home' screen or login screen
->>>>>>> Stashed changes
+        routes: [{ name: "Main Home" }],
       })
     );
-=======
-    navigation.navigate("Home");
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
   };
 
   return (
@@ -105,17 +78,15 @@ export default function TPCProfile({ navigation }) {
       >
         <Text style={styles.buttonText}>Placement Statistics</Text>
       </TouchableOpacity>
-
-<<<<<<< HEAD
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Student Applications")}
       >
         <Text style={styles.buttonText}>View Application</Text>
       </TouchableOpacity>
-
-=======
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Add Placement Data")}>
+        <Text style={styles.buttonText}>Add Placement Data</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>

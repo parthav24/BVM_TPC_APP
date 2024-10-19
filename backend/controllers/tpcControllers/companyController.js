@@ -13,7 +13,7 @@ export const addCompany = async (req, res) => {
             batch_year } = req.body
 
         const new_deadline = new Date(deadline)
-        console.log(name, role, resume, deadline, roles);
+        console.log(name, JSON.parse(role), resume, deadline, roles, req.file.path);
 
         await sequelize.transaction(async (t) => {
 
@@ -23,37 +23,21 @@ export const addCompany = async (req, res) => {
                 {
                     replacements: [
                         name,
-                        role,
-                        resume,
+                        JSON.parse(role),
+                        JSON.parse(resume),
                         new_deadline,
                         req.file.path,
-                        batch_year,
-                        req_CPI || null,
-                        max_active_backlogs || null,
-                        max_dead_backlogs || null
+                        Number(batch_year),
+                        Number(req_CPI) || null,
+                        Number(max_active_backlogs) || null,
+                        Number(max_dead_backlogs) || null
                     ],
                     type: sequelize.QueryTypes.INSERT,
                     transaction: t
                 }
             )
 
-            let roleIds = [];
-            // temporary
-            const array_roles = roles.split(',');
-            for (const role of array_roles) {
-                const roleId = await sequelize.query(
-                    `SELECT role_id FROM roles WHERE role_name = ?`,
-                    {
-                        replacements: [role],
-                        type: sequelize.QueryTypes.SELECT,
-                        transaction: t
-                    }
-                )
-                console.log(role, roleId);
-
-                roleIds.push(roleId[0].role_id);
-            }
-
+            let roleIds = JSON.parse(roles);
             for (const roleId of roleIds) {
                 await sequelize.query(
                     `INSERT INTO company_roles (company_id,role_id)
@@ -69,6 +53,8 @@ export const addCompany = async (req, res) => {
         });
     }
     catch (err) {
+        console.log(err.message);
+
         res.status(501).json({ error: err.message });
     }
 }
@@ -113,6 +99,8 @@ export const updateCompany = async (req, res) => {
             res.status(200).json({ success: true });
         });
     } catch (err) {
+        console.log(err.message);
+
         res.status(501).json({ error: err.message });
     }
 };

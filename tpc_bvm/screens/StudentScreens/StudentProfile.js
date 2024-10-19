@@ -34,20 +34,12 @@ export default function StudentProfile({ navigation }) {
       type: "success",
       text1: "Logged out Successfully",
     });
-<<<<<<< HEAD
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-<<<<<<< Updated upstream
-        routes: [{ name: "Home" }],
-=======
-        routes: [{ name: "Home" }], // Redirect to the 'Home' screen or login screen
->>>>>>> Stashed changes
+        routes: [{ name: "Main Home" }],
       })
     );
-=======
-    navigation.navigate("Home");
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
   };
 
   return (

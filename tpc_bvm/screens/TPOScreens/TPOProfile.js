@@ -1,10 +1,3 @@
-<<<<<<< Updated upstream
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast from 'react-native-toast-message';
-import { Ionicons } from '@expo/vector-icons';
-=======
 import React from "react";
 import {
   View,
@@ -17,7 +10,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { CommonActions } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
->>>>>>> Stashed changes
 
 export default function TPOProfile({ navigation }) {
   // Mock data, replace with real data
@@ -38,20 +30,12 @@ export default function TPOProfile({ navigation }) {
       type: "success",
       text1: "Logged out Successfully",
     });
-<<<<<<< HEAD
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-<<<<<<< Updated upstream
-        routes: [{ name: 'Home' }],
-=======
-        routes: [{ name: "Home" }],
->>>>>>> Stashed changes
+        routes: [{ name: "Main Home" }],
       })
     );
-=======
-    navigation.navigate("Home");
->>>>>>> 5177704c6700545acbb2e14170e3ed05b16f388d
   };
 
   return (

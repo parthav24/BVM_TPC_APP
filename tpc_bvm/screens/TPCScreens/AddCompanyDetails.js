@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,43 +7,69 @@ import {
   Button,
   Switch,
   StyleSheet,
-  Image,
   Alert,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as DocumentPicker from 'expo-document-picker';
+import axios from "axios";
+import MultiSelect from 'react-native-multiple-select';
+import connString from "../../components/connectionString";
 
 const AddCompanyDetails = () => {
   const [companyDetails, setCompanyDetails] = useState({
-    companyName: "",
+    name: "",
     role: false,
     resume: false,
     companyJD: null, // File upload placeholder
     deadline: new Date(),
-    reqCPI: "",
-    maxDeadBacklogs: "",
-    maxActiveBacklogs: "",
-    batchYear: "",
+    req_CPI: "",
+    max_dead_backlogs: "",
+    max_active_backlogs: "",
+    batch_year: "",
+    roles: []
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [availableRoles, setAvailableRoles] = useState(null); // Store roles from API
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || companyDetails.deadline;
+    setCompanyDetails({ ...companyDetails, deadline: currentDate })
     setShowDatePicker(false);
   };
+
+  // Fetch roles from the backend when the "role" toggle is on
+  useEffect(() => {
+    if (companyDetails.role) {
+      axios
+        .get(`${connString}/tpc/get-roles`) // Fetch available roles
+        .then((response) => {
+          setAvailableRoles(response.data.data); // Set available roles
+        })
+        .catch((error) => {
+          console.error("Error fetching roles:", error);
+        });
+    }
+  }, [companyDetails.role]);
 
   // Function to handle file upload
   const handleFileUpload = async () => {
     try {
       // Document picker logic
       const result = await DocumentPicker.getDocumentAsync({
-        type: "*/*", // All file types
+        type: "application/pdf", // All file types
       });
 
-      if (result.type === "success") {
+      if (result.canceled === false) {
         // Set the file details in your state
-        setCompanyDetails({ ...companyDetails, companyJD: result });
+        setCompanyDetails({
+          ...companyDetails, companyJD: {
+            uri: result.assets[0].uri,
+            name: result.assets[0].name,
+            type: result.assets[0].mimeType,
+          }
+        });
         console.log("File selected: ", result);
       }
     } catch (error) {
@@ -51,137 +77,213 @@ const AddCompanyDetails = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log(companyDetails); // You can handle the form submission here
+  const handleSubmit = async () => {
+    try {
+      // Create a FormData object to send the form data, including the file
+      const formData = new FormData();
+
+      // Append text fields to formData
+      formData.append("name", companyDetails.name);
+      formData.append("role", companyDetails.role);
+      formData.append("resume", companyDetails.resume);
+      formData.append("roles", JSON.stringify(companyDetails.roles));
+      formData.append("deadline", companyDetails.deadline.toISOString()); // Convert date to string format
+      formData.append("req_CPI", companyDetails.req_CPI);
+      formData.append("max_dead_backlogs", companyDetails.max_dead_backlogs);
+      formData.append("max_active_backlogs", companyDetails.max_active_backlogs);
+      formData.append("batch_year", Number(companyDetails.batch_year));
+
+      // Append the file to formData (check if companyJD is not null)
+      if (companyDetails.companyJD) {
+        formData.append("company_JD", {
+          uri: companyDetails.companyJD.uri,
+          name: companyDetails.companyJD.name,
+          type: "application/pdf", // Explicitly specify the MIME type
+        });
+      }
+
+      // Use axios to post the form data
+      const response = await axios.post(`${connString}/tpc/add-company`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Multipart form data is required for file upload
+        },
+      });
+
+      if (response.status === 201) {
+        Alert.alert('Success', 'Company details submitted successfully!', [
+          { text: 'OK' },
+        ]);
+        setCompanyDetails({
+          name: "",
+          role: false,
+          resume: false,
+          companyJD: null, // File upload placeholder
+          deadline: new Date(),
+          req_CPI: "",
+          max_dead_backlogs: "",
+          max_active_backlogs: "",
+          batch_year: "",
+          roles: []
+        })
+      } else {
+        throw new Error('Failed to submit company details');
+      }
+
+    } catch (error) {
+      console.error('Error submitting company details:', error);
+      Alert.alert('Error', 'Failed to submit company details.');
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Company Name"
-        value={companyDetails.companyName}
-        onChangeText={(text) =>
-          setCompanyDetails({ ...companyDetails, companyName: text })
-        }
-        style={styles.input}
-      />
-
-      {/* Role Switch */}
-      <View style={styles.switchContainer}>
-        <Text style={styles.label}>Role</Text>
-        <Switch
-          value={companyDetails.role}
-          onValueChange={(newValue) =>
-            setCompanyDetails({ ...companyDetails, role: newValue })
+    <ScrollView>
+      <View style={styles.container}>
+        <TextInput
+          placeholder="Company Name"
+          value={companyDetails.name}
+          onChangeText={(text) =>
+            setCompanyDetails({ ...companyDetails, name: text.trim() })
           }
+          style={styles.input}
         />
-      </View>
 
-      {/* Resume Switch */}
-      <View style={styles.switchContainer}>
-        <Text style={styles.label}>Resume</Text>
-        <Switch
-          value={companyDetails.resume}
-          onValueChange={(newValue) =>
-            setCompanyDetails({ ...companyDetails, resume: newValue })
-          }
-        />
-      </View>
+        {/* Role Switch */}
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Role</Text>
+          <Switch
+            value={companyDetails.role}
+            onValueChange={(newValue) =>
+              setCompanyDetails({ ...companyDetails, role: newValue })
+            }
+          />
+        </View>
 
-      {/* Company JD (File Upload) */}
-      <View style={styles.uploadContainer}>
-        <Button title="Upload JD" onPress={handleFileUpload} />
-        {companyDetails.companyJD && (
+        {/* Resume Switch */}
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Resume</Text>
+          <Switch
+            value={companyDetails.resume}
+            onValueChange={(newValue) =>
+              setCompanyDetails({ ...companyDetails, resume: newValue })
+            }
+          />
+        </View>
+
+        {/* Show Role Selection when role is enabled */}
+        {companyDetails.role && (
           <View>
-            <Text style={styles.uploadedText}>
-              JD: {companyDetails.companyJD.name}
-            </Text>
-            {/* Preview the file if it is an image */}
-            {companyDetails.companyJD.mimeType?.startsWith("image/") && (
-              <Image
-                source={{ uri: companyDetails.companyJD.uri }}
-                style={styles.imagePreview}
-              />
-            )}
-            {/* If it's a PDF or another file type, you can render a different preview */}
-            {companyDetails.companyJD.mimeType === "application/pdf" && (
+            <Text style={styles.label}>Select Roles</Text>
+            <MultiSelect
+              items={availableRoles?.map((role, i) => ({
+                id: role.role_id,
+                name: role.role_name,
+              }))}
+              uniqueKey="id"
+              onSelectedItemsChange={(roles) =>
+                setCompanyDetails({ ...companyDetails, roles })
+              }
+              selectedItems={companyDetails.roles}
+              selectText="Pick Roles"
+              searchInputPlaceholderText="Search Roles..."
+              submitButtonText="Submit"
+              tagRemoveIconColor="#4A90E2"
+              tagBorderColor="#4A90E2"
+              tagTextColor="#4A90E2"
+              selectedItemTextColor="#4A90E2"
+              selectedItemIconColor="#4A90E2"
+              itemTextColor="#000"
+              displayKey="name"
+              submitButtonColor="#4A90E2"
+              styleInputGroup={styles.multiSelectInputGroup}
+            />
+          </View>
+        )}
+
+        {/* Company JD (File Upload) */}
+        <View style={styles.uploadContainer}>
+          <Button title="Upload Job Description" onPress={handleFileUpload} />
+          {companyDetails?.companyJD && (
+            <View>
+              <Text style={styles.uploadedText}>
+                JD: {companyDetails.companyJD?.name}
+              </Text>
               <Text style={styles.previewText}>
                 Preview not available for PDF files.
               </Text>
-            )}
-          </View>
+            </View>
+          )}
+        </View>
+
+        {/* Deadline (DateTime Picker) */}
+        <View style={styles.inputContainer}>
+          <Text>Select Deadline : {companyDetails.deadline.toDateString()}</Text>
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.dateButton}
+          >
+            <Text style={styles.buttonText}>Select Deadline</Text>
+          </TouchableOpacity>
+        </View>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={companyDetails.deadline}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+            minimumDate={new Date()}
+          />
         )}
-      </View>
-
-      {/* Deadline (DateTime Picker) */}
-      <View style={styles.inputContainer}>
-        <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={styles.dateButton}
-        >
-          <Text style={styles.buttonText}>Select Deadline</Text>
-        </TouchableOpacity>
-        <Text>{companyDetails.deadline.toDateString()}</Text>
-      </View>
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={companyDetails.deadline}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
+        {/* Required CPI */}
+        <TextInput
+          placeholder="Required CPI"
+          value={companyDetails.req_CPI}
+          onChangeText={(text) =>
+            setCompanyDetails({ ...companyDetails, req_CPI: text })
+          }
+          style={styles.input}
+          keyboardType="numeric"
         />
-      )}
 
-      {/* Required CPI */}
-      <TextInput
-        placeholder="Required CPI"
-        value={companyDetails.reqCPI}
-        onChangeText={(text) =>
-          setCompanyDetails({ ...companyDetails, reqCPI: text })
-        }
-        style={styles.input}
-        keyboardType="numeric"
-      />
+        {/* Max Dead Backlogs */}
+        <TextInput
+          placeholder="Max Dead Backlogs"
+          value={companyDetails.max_dead_backlogs}
+          onChangeText={(text) =>
+            setCompanyDetails({ ...companyDetails, max_dead_backlogs: text })
+          }
+          style={styles.input}
+          keyboardType="numeric"
+        />
 
-      {/* Max Dead Backlogs */}
-      <TextInput
-        placeholder="Max Dead Backlogs"
-        value={companyDetails.maxDeadBacklogs}
-        onChangeText={(text) =>
-          setCompanyDetails({ ...companyDetails, maxDeadBacklogs: text })
-        }
-        style={styles.input}
-        keyboardType="numeric"
-      />
+        {/* Max Active Backlogs */}
+        <TextInput
+          placeholder="Max Active Backlogs"
+          value={companyDetails.max_active_backlogs}
+          onChangeText={(text) =>
+            setCompanyDetails({ ...companyDetails, max_active_backlogs: text })
+          }
+          style={styles.input}
+          keyboardType="numeric"
+        />
 
-      {/* Max Active Backlogs */}
-      <TextInput
-        placeholder="Max Active Backlogs"
-        value={companyDetails.maxActiveBacklogs}
-        onChangeText={(text) =>
-          setCompanyDetails({ ...companyDetails, maxActiveBacklogs: text })
-        }
-        style={styles.input}
-        keyboardType="numeric"
-      />
+        {/* Batch Year */}
+        <TextInput
+          placeholder="Batch Year"
+          value={companyDetails.batch_year}
+          onChangeText={(text) =>
+            setCompanyDetails({ ...companyDetails, batch_year: text })
+          }
+          style={styles.input}
+          keyboardType="numeric"
+        />
 
-      {/* Batch Year */}
-      <TextInput
-        placeholder="Batch Year"
-        value={companyDetails.batchYear}
-        onChangeText={(text) =>
-          setCompanyDetails({ ...companyDetails, batchYear: text })
-        }
-        style={styles.input}
-        keyboardType="numeric"
-      />
-
-      {/* Submit Button */}
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Submit Button */}
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Submit</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 

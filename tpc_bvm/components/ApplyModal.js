@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
 import axios from 'axios';
-import DocumentPicker from 'react-native-document-picker';
 import CheckBox from 'react-native-check-box';
+import * as DocumentPicker from 'expo-document-picker';
 import connString from './connectionString';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
-    const [roles, setRoles] = useState([{ name: "1" }, { name: "2" }]);
+    const [roles, setRoles] = useState([]);
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [userData, setUserData] = useState(null);
     const [resume, setResume] = useState(null); // To store the resume file
@@ -41,39 +41,62 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
 
     const handleResumeUpload = async () => {
         try {
-            console.log("Resume");
-
-            const result = await DocumentPicker.pick({
-                presentationStyle: 'fullScreen',
-                type: [DocumentPicker.types.pdf],
+            // Document picker logic
+            const result = await DocumentPicker.getDocumentAsync({
+                type: "application/pdf", // All file types
             });
-            console.log("Hello");
 
-            console.log(result);
-        } catch (error) {
-            if (DocumentPicker.isCancel(error)) {
-                console.log(error);
-
+            if (result.canceled === false) {
+                // Set the file details in your state
+                setResume({
+                    uri: result.assets[0].uri,
+                    name: result.assets[0].name,
+                    type: result.assets[0].mimeType,
+                });
+                console.log("File selected: ", result);
             }
+        } catch (error) {
+            console.error("Error picking document: ", error);
         }
     };
 
     const handleApplySubmit = async () => {
         try {
-            // const formData = new FormData();
-            // if (resume) {
-            //     formData.append('resumeFile', {
-            //         uri: resume.uri,
-            //         name: resume.name,
-            //         type: resume.mimeType || 'application/octet-stream', // Set a default MIME type
-            //     });
-            // }
-            // formData.append('roles', JSON.stringify(selectedRoles)); // Convert roles array to JSON string
-            const response = await axios.post(`${connString}/user/submit-application`, { uid: userData.uid, roleIds: selectedRoles, company_id: selectedDrive.company_id });
-            alert(response.data.message);
+            if (selectedDrive.role && selectedRoles.length === 0) {
+                throw new Error("Atleast One role is required!")
+            }
+            const formData = new FormData();
+            formData.append('uid', userData.uid);
+            formData.append('company_id', selectedDrive.company_id);
+            formData.append('company_name', selectedDrive.name);
+            formData.append('roles', JSON.stringify(selectedRoles)); // Convert roles array to JSON string
+            if (resume) {
+                console.log("Hello", resume.name);
+
+                formData.append('resume', {
+                    uri: resume.uri,
+                    name: resume.name,
+                    type: 'application/pdf'
+                });
+            }
+
+            const response = await axios.post(`${connString}/user/submit-application`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', // Multipart form data is required for file upload
+                },
+            });
+            setRoles([]);
+            setSelectedRoles([]);
+            setResume(null);
+            // alert(response.data.message);
+            console.log(response.data);
+
+            alert("Applied")
             setModalVisible(false); // Close modal on success
         } catch (error) {
-            alert("Already Applied for Drive");
+            alert(error.message);
+            console.log(error);
+
             console.error('Error submitting application:', error.response ? error.response.data : error.message);
             setModalVisible(false); // Close modal on success
         }
@@ -89,7 +112,7 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Apply for {selectedDrive?.name}</Text>
                     {/* Role Selection */}
-                    {selectedDrive?.role && <Text style={styles.modalText}>Select Roles:</Text>}
+                    {selectedDrive?.role === 1 && <Text style={styles.modalText}>Select Roles:</Text>}
                     <ScrollView style={styles.rolesContainer}>
                         {roles.map((role) => (
                             <View key={role.role_id}>
@@ -103,9 +126,10 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
                     </ScrollView>
 
                     {/* Resume Upload */}
-                    {/* <Text style={styles.modalText}>Upload Resume:</Text>
-                    <Button title="Select Resume" onPress={handleResumeUpload} />
-                    {resume && <Text style={styles.modalText}>Selected Resume: {resume.name}</Text>} */}
+                    {selectedDrive?.resume === 1 && <>
+                        <Text style={styles.modalText}>Upload Resume : {resume && <Text style={styles.modalText}>{resume.name}</Text>}</Text>
+                        <TouchableOpacity style={styles.submitButton} onPress={handleResumeUpload} ><Text style={styles.buttonText} >Select Resume</Text></TouchableOpacity>
+                    </>}
 
                     <TouchableOpacity style={styles.submitButton} onPress={handleApplySubmit}><Text style={styles.buttonText}>SUBMIT APPLICATION </Text></TouchableOpacity>
                     <TouchableOpacity style={styles.submitButton} onPress={() => setModalVisible(false)} ><Text style={styles.buttonText}>CANCLE </Text></TouchableOpacity>
@@ -134,7 +158,7 @@ const styles = StyleSheet.create({
     },
     modalText: {
         fontWeight: 'bold',
-        marginVertical: 10,
+        marginVertical: 2,
     },
     link: {
         color: 'blue',

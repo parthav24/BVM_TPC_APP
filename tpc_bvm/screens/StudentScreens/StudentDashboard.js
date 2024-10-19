@@ -6,6 +6,7 @@ import ApplyModal from '../../components/ApplyModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
+
 export default function StudentDashboard() {
   const [selectedTab, setSelectedTab] = useState('upcoming');
   const [modalVisible, setModalVisible] = useState(false);
@@ -106,7 +107,7 @@ export default function StudentDashboard() {
             </Text>
             <Text style={styles.itemSubText}>
               <Ionicons name="star-outline" size={16} color="#007bff" />
-              {" "}Minimum CPI: {item.req_CPI}
+              {" "}Minimum CPI: {item.req_CPI || "NA"}
             </Text>
             <Text style={styles.itemSubText}>
               <Ionicons name="checkmark-circle-outline" size={16} color="#007bff" />
@@ -126,7 +127,8 @@ export default function StudentDashboard() {
         )}
         {selectedTab === 'completed' && (
           <>
-            <Text style={styles.itemSubText}>Start Date: {item.complete_date}</Text>
+            <Text style={styles.itemSubText}>Start Date: {item.visit_date}</Text>
+            <Text style={styles.itemSubText}>Complete Date: {item.complete_date}</Text>
             <Text style={styles.itemSubText}>No. Placed Students: {item.no_of_students_placed}</Text>
           </>
         )}
@@ -139,13 +141,13 @@ export default function StudentDashboard() {
       <Text style={styles.title}>Student Dashboard</Text>
 
       <View style={styles.tabContainer}>
-        <TouchableOpacity style={[styles.tabButton, selectedTab === 'ongoing' && styles.activeTab]} onPress={() => setSelectedTab('ongoing')}>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'ongoing' && styles.activeTab]} onPress={() => { setSelectedTab('ongoing') }}>
           <Text style={[styles.tabButtonText]}>Ongoing</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tabButton, selectedTab === 'upcoming' && styles.activeTab]} onPress={() => setSelectedTab('upcoming')}>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'upcoming' && styles.activeTab]} onPress={() => { setSelectedTab('upcoming') }}>
           <Text style={styles.tabButtonText}>Upcoming</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tabButton, selectedTab === 'completed' && styles.activeTab]} onPress={() => setSelectedTab('completed')}>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'completed' && styles.activeTab]} onPress={() => { setSelectedTab('completed') }}>
           <Text style={styles.tabButtonText}>Completed</Text>
         </TouchableOpacity>
       </View>
