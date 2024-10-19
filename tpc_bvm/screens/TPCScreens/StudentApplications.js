@@ -13,10 +13,6 @@ import {
 
 export default function StudentApplications({ navigation }) {
   const [userData, setUserData] = useState(null);
-  // const [students, setStudents] = useState({
-  //   approvedStudents: [{ "address": "Surat", "cpi": 8.4, "createdAt": "2024-09-29T08:56:25.000Z", "dept_id": 3, "diploma_cpi": 0, "dob": "2003-04-08", "email": "italiyadhruv09@gmail.com", "f_name": "Dhruv", "gender": "male", "hsc_percentage": 99.2, "id": "21CP029", "l_name": "Italiya", "m_name": "Narshibhai", "mobile": "9714189489", "no_active_backlog": 0, "no_dead_backlog": 0, "passout_year": 2025, "password": "$2b$10$N/BR7UJdDqifS/f4lunWzOEF7Jy/8QqJ7HzN7e/yQNMs6yTg0JigO", "role": "student", "sem1": 8.4, "sem2": 8.4, "sem3": 8.4, "sem4": 8.4, "sem5": 0, "sem6": 0, "sem7": 0, "sem8": 0, "ssc_percentage": 98.4, "uid": "21CP029" }],
-  //   pendingStudents: [{ "address": "Surat", "cpi": 8.4, "createdAt": "2024-09-29T08:56:25.000Z", "dept_id": 3, "diploma_cpi": 0, "dob": "2003-04-08", "email": "italiyadhruv09@gmail.com", "f_name": "Dhruv", "gender": "male", "hsc_percentage": 99.2, "id": "21CP029", "l_name": "Italiya", "m_name": "Narshibhai", "mobile": "9714189489", "no_active_backlog": 0, "no_dead_backlog": 0, "passout_year": 2025, "password": "$2b$10$N/BR7UJdDqifS/f4lunWzOEF7Jy/8QqJ7HzN7e/yQNMs6yTg0JigO", "role": "student", "sem1": 8.4, "sem2": 8.4, "sem3": 8.4, "sem4": 8.4, "sem5": 0, "sem6": 0, "sem7": 0, "sem8": 0, "ssc_percentage": 98.4, "uid": "21CP029" }]
-  // });
   const [students, setStudents] = useState({
     approvedStudents: [],
     pendingStudents: []
@@ -62,14 +58,15 @@ export default function StudentApplications({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
-        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('pending')}>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'pending' && styles.activeTab]} onPress={() => setSelectedTab('pending')}>
           <Text style={styles.tabButtonText}>Pending</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('approved')}>
+        <TouchableOpacity style={[styles.tabButton, selectedTab === 'approved' && styles.activeTab]} onPress={() => setSelectedTab('approved')}>
           <Text style={styles.tabButtonText}>Approved</Text>
         </TouchableOpacity>
       </View>
-      {selectedTab == 'approved' && <FlatList
+      {selectedTab == 'approved' && (
+        students.approvedStudents.length > 0 ? <FlatList
         data={students.approvedStudents}
         keyExtractor={(item, idx) => idx}
         renderItem={({ item }) => (
@@ -96,38 +93,46 @@ export default function StudentApplications({ navigation }) {
             </View>
           </View>
         )}
-      />}
-      {selectedTab == 'pending' && <FlatList
-        data={students.pendingStudents}
-        keyExtractor={(item, idx) => idx}
-        renderItem={({ item }) => (
-          <View style={styles.studentItem}>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.studentText}>ID : </Text>
-              <Text style={{ fontWeight: "bold" }}>{item.uid} </Text>
+      />:
+      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={styles.noData}>No Students Available</Text>
+      </View>)}
+      {selectedTab === 'pending' && (
+        students.pendingStudents.length > 0 ? <FlatList
+          data={students.pendingStudents}
+          keyExtractor={(item, idx) => idx}
+          renderItem={({ item }) => (
+            <View style={styles.studentItem}>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.studentText}>ID : </Text>
+                <Text style={{ fontWeight: "bold" }}>{item.uid} </Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.studentText}>Name : </Text>
+                <Text style={{ fontWeight: "bold" }}>{item.f_name} {item.l_name}</Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.studentText}>Status: </Text>
+                <Text style={{
+                  color: "#e1ad01",
+                  fontWeight: "bold"
+                }}>Pending</Text>
+              </View>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.viewButton}
+                  onPress={() => handleViewClick(item.uid)}
+                >
+                  <Text style={styles.buttonText}>View Application</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.studentText}>Name : </Text>
-              <Text style={{ fontWeight: "bold" }}>{item.f_name} {item.l_name}</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.studentText}>Status: </Text>
-              <Text style={{
-                color: "#e1ad01",
-                fontWeight: "bold"
-              }}>Pending</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.viewButton}
-                onPress={() => handleViewClick(item.uid)}
-              >
-                <Text style={styles.buttonText}>View Application</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      />}
+          )}
+        /> :
+          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={styles.noData}>No Students Available</Text>
+          </View>)}
+
       <DisplayStudent
         student={selectedUser}
         modalVisible={modalVisible}
@@ -161,6 +166,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#841584',
   },
+  activeTab: {
+    backgroundColor: '#702963',
+  },
   tabButtonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -173,6 +181,10 @@ const styles = StyleSheet.create({
   pendingText: {
     color: "yellow",
     fontWeight: "bold"
+  },
+  noData: {
+    color: 'gray',
+    fontSize: 36
   },
   title: {
     fontSize: 24,

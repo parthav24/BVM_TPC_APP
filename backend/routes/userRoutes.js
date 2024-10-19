@@ -12,7 +12,7 @@ router.put('/profile', authMiddleware, updateUserProfile);
 
 // Route for submitting an application, with multer middleware for resume upload
 // Uploading resume is pending 
-router.post('/submit-application', authMiddleware, checkStudentRole, submitApplication);
+router.post('/submit-application',upload.single('resume'), authMiddleware, checkStudentRole, submitApplication);
 
 // display company
 router.get('/get-companies', authMiddleware, checkStudentRole, getCompanyDetails)

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const {name} = req.body; // Make sure to pass companyId and userId in request body
-
+        
         const __filename = fileURLToPath(import.meta.url);
         console.log(name);
         
