@@ -143,9 +143,9 @@ export default function SignUpScreen({ navigation }) {
 
     if (
       formData.mobile &&
-      (formData.mobile.length < 10 || formData.mobile.length > 15)
+      (formData.mobile.length != 10)
     ) {
-      newErrors.mobile = "Mobile number must be between 10 and 15 digits";
+      newErrors.mobile = "Mobile number must be 10 digits";
     }
 
     if (formData.password && formData.password !== formData.confirmPassword) {

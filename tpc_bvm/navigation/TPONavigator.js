@@ -3,6 +3,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { TouchableOpacity, Image } from 'react-native';
 import TPOHomeScreen from '../screens/TPOScreens/TPOHomeScreen';
 import TPOProfile from '../screens/TPOScreens/TPOProfile'; // Import TPO Profile screen
+import EditStudentDetails from '../screens/TPCScreens/EditStudentDetails';
+import StudentApplications from '../screens/TPCScreens/StudentApplications';
+import OngoingDrivesScreen from '../screens/TPCScreens/OngoingDrivesScreen';
+import CompanyStudentDetails from '../screens/TPCScreens/CompanyStudentDetails';
+import AddCompanyDetails from '../screens/TPCScreens/AddCompanyDetails';
+import AddPlacement from '../screens/TPCScreens/AddPlacementData';
+import AddTPCScreen from '../screens/TPOScreens/AddTPCScreen';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +28,13 @@ function TPONavigator({ navigation }) {
         }}
       />
       <Stack.Screen name="TPOProfile" component={TPOProfile} />
+      <Stack.Screen name="Student Applications" component={StudentApplications} />
+      <Stack.Screen name="EditStudentDetails" component={EditStudentDetails} />
+      <Stack.Screen name="OngoingDrivesScreen" component={OngoingDrivesScreen} />
+      <Stack.Screen name="Company Student Details" component={CompanyStudentDetails} />
+      <Stack.Screen name="Add Company Details" component={AddCompanyDetails} />
+      <Stack.Screen name="Add Placement Data" component={AddPlacement} />
+      <Stack.Screen name="Register TPC" component={AddTPCScreen} />
     </Stack.Navigator>
   );
 }
