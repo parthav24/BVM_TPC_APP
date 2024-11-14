@@ -1,31 +1,59 @@
 import { CommonActions } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
+import connString from '../../components/connectionString';
 
 export default function TPCProfile({ navigation }) {
   // Mock data, replace with real data
-  const tpcDetails = {
-    name: "Alice Smith",
-    branch: "Electronics and Communication",
-    currentTPO: "Mr. Sharma",
-    members: [
-      {
-        name: "Bob Brown",
-        branch: "CSE",
-        email: "bob@example.com",
-        phone: "1234567890",
-      },
-      {
-        name: "Charlie White",
-        branch: "Mechanical",
-        email: "charlie@example.com",
-        phone: "0987654321",
-      },
-    ],
-  };
+  const [tpcDetails, setTpcDetails] = useState(null);
+  const [tpoDetails, setTpoDetails] = useState(null);
+  const [tpcMembers, setTpcMembers] = useState(null);
+  // useEffect(() => {
+  //   console.log(tpcDetails);
+  // }, [tpcDetails]);
+  useEffect(() => {
+    const fetchTpcData = async () => {
+      try {
+        const response = await axios.get(`${connString}/tpc/get-profile`);
+        console.log(response.data.tpcData);
+        console.log("Hello");
+
+        setTpcDetails(response.data.tpcData);
+      } catch (err) {
+        console.log("Error while fetching tpc profile", err.message);
+      }
+    }
+    const fetchTpoData = async () => {
+      try {
+        const response = await axios.get(`${connString}/tpc/get-tpo-name`);
+        console.log(response.data.tpoData);
+        console.log("Hello");
+
+        setTpoDetails(response.data.tpoData);
+      } catch (err) {
+        console.log("Error while fetching tpc profile", err.message);
+      }
+    }
+    const fetchTpcMembersData = async () => {
+      try {
+        const response = await axios.get(`${connString}/tpc/get-tpc-members`);
+        console.log(response.data.tpcMembersData);
+        console.log("Hello");
+
+        setTpoDetails(response.data.tpcMembersData);
+      } catch (err) {
+        console.log("Error while fetching tpc profile", err.message);
+      }
+    }
+    fetchTpcData();
+    fetchTpoData();
+    fetchTpcMembersData();
+  }, [])
+
 
   const handleLogout = () => {
     AsyncStorage.removeItem("userData");
@@ -48,28 +76,36 @@ export default function TPCProfile({ navigation }) {
         <Text style={styles.title}>TPC Profile</Text>
         <Text style={styles.label}>
           <Ionicons name="person-outline" size={18} color="#007bff" /> Name:{" "}
-          <Text style={styles.value}>{tpcDetails.name}</Text>
+          <Text style={styles.value}>{tpcDetails?.f_name} {tpcDetails?.l_name}</Text>
         </Text>
         <Text style={styles.label}>
           <Ionicons name="book-outline" size={18} color="#007bff" /> Branch:{" "}
-          <Text style={styles.value}>{tpcDetails.branch}</Text>
+          <Text style={styles.value}>{tpcDetails?.dept_name}</Text>
+        </Text>
+        <Text style={styles.label}>
+          <Ionicons name="call-outline" size={18} color="#007bff" /> Mobile:{" "}
+          <Text style={styles.value}>{tpcDetails?.mobile}</Text>
+        </Text>
+        <Text style={styles.label}>
+          <Ionicons name="mail-outline" size={18} color="#007bff" /> Email:{" "}
+          <Text style={styles.value}>{tpcDetails?.email}</Text>
         </Text>
         <Text style={styles.label}>
           <Ionicons name="people-outline" size={18} color="#007bff" /> Current
-          TPO: <Text style={styles.value}>{tpcDetails.currentTPO}</Text>
+          TPO: <Text style={styles.value}>{tpoDetails?.f_name} {tpoDetails?.l_name}</Text>
         </Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.subTitle}>Members:</Text>
-        {tpcDetails.members.map((member, index) => (
+        {/* {tpcDetails.members.map((member, index) => (
           <View key={index} style={styles.memberContainer}>
             <Text style={styles.memberName}>Name: {member.name}</Text>
             <Text>Branch: {member.branch}</Text>
             <Text>Email: {member.email}</Text>
             <Text>Phone: {member.phone}</Text>
           </View>
-        ))}
+        ))} */}
       </View>
 
       <TouchableOpacity

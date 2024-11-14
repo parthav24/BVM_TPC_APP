@@ -1,8 +1,20 @@
+import sequelize from "../../config/database.js";
 
 export const getUserProfile = async (req, res) => {
     try {
         // Return user data
-        res.status(200).json({message:req.user});
+        await sequelize.transaction(async (t) => {
+            const studentData = await sequelize.query(
+                `SELECT * FROM students JOIN department ON students.dept_id=department.dept_id WHERE uid = ?`,
+                {
+                    replacements: [req.user.uid],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t
+                }
+            )
+
+            res.status(200).json({ studentData:studentData[0] });
+        })
     } catch (err) {
         res.status(500).json({ message: 'Error retrieving user data', error: err.message });
     }

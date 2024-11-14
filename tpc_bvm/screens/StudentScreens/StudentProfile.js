@@ -1,30 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  ActivityIndicator
 } from "react-native";
 import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import connString from "../../components/connectionString";
 
 export default function StudentProfile({ navigation }) {
-  const studentDetails = {
-    name: "John Doe",
-    branch: "Computer Science Engineering",
-    rollNumber: "CSE-12345",
-    email: "johndoe@example.com",
-    phone: "9876543210",
-    appliedCompanies: 5,
-    placedCompany: "Google",
-    skills: ["JavaScript", "React Native", "Node.js"],
-    internships: [
-      { company: "XYZ Corp", duration: "3 months" },
-      { company: "ABC Inc.", duration: "2 months" },
-    ],
+  const [studentDetails, setStudentDetails] = useState({});
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const response = await axios.get(`${connString}/user/get-profile`);
+        console.log(response.data.studentData);
+        setStudentDetails(response.data.studentData);
+      } catch (err) {
+
+      }
+    }
+    fetchStudentData();
+  }, [])
+
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+
+  const handleToggle = async () => {
+    setExpanded(!expanded);
+
+    if (!expanded) {
+      // Make API call only when expanding the section
+      setLoading(true);
+      try {
+        const response = await axios.get(`${connString}/user/get-all-application`); // Replace with your API endpoint
+        setData(response.data.allApplications);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleDate = (date) => {
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    const hours = (date.getHours() % 12) || 12;
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
   };
 
   const handleLogout = () => {
@@ -48,15 +88,15 @@ export default function StudentProfile({ navigation }) {
         <Text style={styles.title}>Profile</Text>
         <Text style={styles.label}>
           <Ionicons name="person-outline" size={18} color="#007bff" /> Name:{" "}
-          <Text style={styles.value}>{studentDetails.name}</Text>
+          <Text style={styles.value}>{studentDetails.f_name} {studentDetails.l_name}</Text>
         </Text>
         <Text style={styles.label}>
           <Ionicons name="book-outline" size={18} color="#007bff" /> Branch:{" "}
-          <Text style={styles.value}>{studentDetails.branch}</Text>
+          <Text style={styles.value}>{studentDetails.dept_name}</Text>
         </Text>
         <Text style={styles.label}>
           <Ionicons name="id-card-outline" size={18} color="#007bff" /> Roll
-          Number: <Text style={styles.value}>{studentDetails.rollNumber}</Text>
+          Number: <Text style={styles.value}>{studentDetails.uid}</Text>
         </Text>
         <Text style={styles.label}>
           <Ionicons name="mail-outline" size={18} color="#007bff" /> Email:{" "}
@@ -64,24 +104,60 @@ export default function StudentProfile({ navigation }) {
         </Text>
         <Text style={styles.label}>
           <Ionicons name="call-outline" size={18} color="#007bff" /> Phone:{" "}
-          <Text style={styles.value}>{studentDetails.phone}</Text>
+          <Text style={styles.value}>{studentDetails.mobile}</Text>
         </Text>
         <Text style={styles.label}>
-          <Ionicons name="business-outline" size={18} color="#007bff" /> Applied
-          Companies:{" "}
-          <Text style={styles.value}>{studentDetails.appliedCompanies}</Text>
+          <Ionicons name="calendar-outline" size={18} color="#007bff" /> Birth Date:{" "}
+          <Text style={styles.value}>{studentDetails.dob}</Text>
         </Text>
-        <Text style={styles.label}>
+        {/* <Text style={styles.label}>
           <Ionicons name="checkmark-circle-outline" size={18} color="#007bff" />{" "}
           Placed Company:{" "}
-          <Text style={styles.value}>{studentDetails.placedCompany}</Text>
-        </Text>
+          <Text style={styles.value}>{data?.find((application)=>application.status=='accepted')}</Text>
+        </Text> */}
       </View>
+      <View style={styles.card}>
+        <TouchableOpacity onPress={handleToggle} style={styles.appliedCompaniesHeader}>
+          <Text style={styles.headerText}>Appied Companies</Text>
+          <Ionicons style={styles.headerTxt} name="chevron-down" size={25} color='#007bff' />
+        </TouchableOpacity>
 
+        {expanded && (
+          <View style={styles.content}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <View>
+                {data ? (
+                  data.map((item, index) => (
+                    <View key={index} style={styles.item}>
+                      <Text style={styles.itemText}>Name: {item.name}</Text>
+                      <Text style={styles.itemText}>Round Reached: {item.round_reached}</Text>
+                      <Text style={styles.itemText}>Applied On: {handleDate(new Date(item.createdAt))}</Text>
+
+                      {/* Conditionally display the status */}
+                      {item.status === 'accepted' && (
+                        <View style={styles.statusMainContainer}>
+                          <Text style={styles.itemText}>Status : </Text>
+                          <View style={styles.statusContainer}>
+                            <Text style={styles.statusText}>Accepted</Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.noDataText}>No data available</Text>
+                )}
+              </View>
+            )}
+          </View>
+        )}
+      </View>
       <View style={styles.card}>
         <Text style={styles.subTitle}>Skills</Text>
         <View style={styles.skillsContainer}>
-          {studentDetails.skills.map((skill, index) => (
+          {studentDetails.skills?.map((skill, index) => (
             <Text key={index} style={styles.skill}>
               {skill}
             </Text>
@@ -91,7 +167,7 @@ export default function StudentProfile({ navigation }) {
 
       <View style={styles.card}>
         <Text style={styles.subTitle}>Internships</Text>
-        {studentDetails.internships.map((internship, index) => (
+        {studentDetails.internships?.map((internship, index) => (
           <Text key={index} style={styles.internship}>
             {internship.company} - {internship.duration}
           </Text>
@@ -150,6 +226,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  appliedCompaniesHeader:{
+    flexDirection:'row',
+    alignItems:'center', 
   },
   title: {
     fontSize: 24,
@@ -214,5 +294,61 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  headerText: {
+    fontSize: 18,
+    color: '#007bff',
+    marginBottom: 5,
+    fontWeight: 'bold',
+  },
+  content: {
+    padding: 15,
+    backgroundColor: '#ecf0f1',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#bdc3c7',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  item: {
+    marginBottom: 15,
+    padding: 15,
+    backgroundColor: '#ffffff',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#2c3e50',
+  },
+  statusMainContainer: {
+    flexDirection: 'row'
+  },
+  statusContainer: {
+    marginTop: 0,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: '#27ae60',
+    borderRadius: 5,
+  },
+  statusText: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

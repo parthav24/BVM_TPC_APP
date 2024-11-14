@@ -10,6 +10,7 @@ import { checkTpcRole } from "../middlewares/roleMiddleware.js";
 import { getSelectedCandidates, moveNextRound, rejectCandidate, selectCandidate } from "../controllers/tpcControllers/applicationController.js";
 import { addPlacementData } from "../controllers/tpcControllers/placementController.js";
 import { editCandidateDetails, getApprovedCandidates, getPendingCandidates } from "../controllers/tpcControllers/userController.js";
+import { getTpcProfile, getTpoName } from "../controllers/tpcControllers/tpcProfileController.js";
 
 const router = express.Router();
 
@@ -41,5 +42,10 @@ router.get('/get-selected-candidates', authMiddleware, checkTpcRole, getSelected
 
 //placement data routes
 router.post('/add-placement-data', authMiddleware, checkTpcRole, addPlacementData);
+
+// tpc profile
+router.get('/get-profile', authMiddleware, checkTpcRole, getTpcProfile);
+router.get('/get-tpo-name', authMiddleware, checkTpcRole, getTpoName);
+// router.put('/profile', authMiddleware, updateUserProfile);
 
 export default router;
