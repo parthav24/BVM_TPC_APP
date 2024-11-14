@@ -10,6 +10,7 @@ import CompanyStudentDetails from '../screens/TPCScreens/CompanyStudentDetails';
 import AddCompanyDetails from '../screens/TPCScreens/AddCompanyDetails';
 import AddPlacement from '../screens/TPCScreens/AddPlacementData';
 import AddTPCScreen from '../screens/TPOScreens/AddTPCScreen';
+import AddDepartment from '../screens/TPOScreens/AddDepartment';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,8 @@ function TPONavigator({ navigation }) {
       <Stack.Screen name="Add Company Details" component={AddCompanyDetails} />
       <Stack.Screen name="Add Placement Data" component={AddPlacement} />
       <Stack.Screen name="Register TPC" component={AddTPCScreen} />
+      <Stack.Screen name="Add Department" component={AddDepartment} />
+
     </Stack.Navigator>
   );
 }
