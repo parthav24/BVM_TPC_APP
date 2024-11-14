@@ -58,3 +58,26 @@ export const submitApplication = async (req, res) => {
         return res.status(500).json({ error: 'Error submitting application' });
     }
 }
+
+export const getAllApplications = async (req, res) => {
+    try {
+        await sequelize.transaction(async (t) => {
+            // Step 1: Check if the company requires a resume
+            console.log("get all application");
+
+            const allApplications = await sequelize.query(
+                `SELECT C.name,A.round_reached,A.status,A.createdAt FROM application A JOIN company C ON A.company_id=C.company_id WHERE uid = ?`,
+                {
+                    replacements: [req.user.uid],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t
+                }
+            );
+            return res.status(201).json({ allApplications });
+        });
+
+    } catch (error) {
+        console.error('Error fetching application:', error);
+        return res.status(500).json({ error: 'Error fetching application' });
+    }
+}

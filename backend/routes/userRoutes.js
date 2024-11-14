@@ -2,17 +2,18 @@ import express from 'express';
 import { getUserProfile, updateUserProfile } from '../controllers/userControllers/userController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import upload from '../config/multerResumeConfig.js'; // Import multer config
-import { submitApplication } from '../controllers/userControllers/applicationController.js';
+import { getAllApplications, submitApplication } from '../controllers/userControllers/applicationController.js';
 import { checkStudentRole } from '../middlewares/roleMiddleware.js';
 import { getCompanyDetails, getCompanyRoleDetails } from '../controllers/userControllers/companyController.js';
 const router = express.Router();
 
-router.get('/profile', authMiddleware, getUserProfile);
+router.get('/get-profile', authMiddleware, checkStudentRole, getUserProfile);
 router.put('/profile', authMiddleware, updateUserProfile);
 
 // Route for submitting an application, with multer middleware for resume upload
 // Uploading resume is pending 
-router.post('/submit-application',upload.single('resume'), authMiddleware, checkStudentRole, submitApplication);
+router.post('/submit-application', upload.single('resume'), authMiddleware, checkStudentRole, submitApplication);
+router.get('/get-all-application', authMiddleware, checkStudentRole, getAllApplications);
 
 // display company
 router.get('/get-companies', authMiddleware, checkStudentRole, getCompanyDetails)
