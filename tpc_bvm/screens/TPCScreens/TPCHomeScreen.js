@@ -24,7 +24,7 @@ export default function TPCHomeScreen({ navigation }) {
         </TouchableOpacity>
 
         {/* Ongoing Drives */}
-        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('OngoingDrivesScreen')}>
+        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('Ongoing Drives')}>
           <Ionicons name="play-outline" size={40} color="#4A90E2" />
           <Text style={styles.optionText}>Ongoing Drives</Text>
         </TouchableOpacity>

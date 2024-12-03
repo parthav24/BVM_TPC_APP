@@ -2,7 +2,7 @@ import sequelize from "../../config/database.js";
 
 export const getCompanyDetails = async (req, res) => {
     try {
-        console.log(req.user);
+        console.log("getcomapny log",req.user);
 
         await sequelize.transaction(async (t) => {
             const company_data = await sequelize.query(
