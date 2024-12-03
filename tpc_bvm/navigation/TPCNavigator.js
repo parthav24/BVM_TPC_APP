@@ -31,7 +31,7 @@ function TPCNavigator({ navigation }) {
       <Stack.Screen name="Dashboard" component={TPCDashboard} />
       <Stack.Screen name="Student Applications" component={StudentApplications} />
       <Stack.Screen name="EditStudentDetails" component={EditStudentDetails} />
-      <Stack.Screen name="OngoingDrivesScreen" component={OngoingDrivesScreen} />
+      <Stack.Screen name="Ongoing Drives" component={OngoingDrivesScreen} />
       <Stack.Screen name="Company Student Details" component={CompanyStudentDetails} />
       <Stack.Screen name="Add Company Details" component={AddCompanyDetails} />
       <Stack.Screen name="Add Placement Data" component={AddPlacement} />

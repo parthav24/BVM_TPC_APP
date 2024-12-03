@@ -99,19 +99,21 @@ export const login = async (req, res) => {
         if (user.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
-
+        req.user = user[0];
+        
         // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user[0].password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-
+        
         const token = jwt.sign(
-            { uid: user[0].uid, role: user[0].role },
+            { uid: user[0].uid, role: user[0].role,passout_year:user[0].passout_year },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION }
         );
         delete user[0].password;
+        console.log("Login",req.user);
         // If the password matches, proceed with login
         res.status(200).json({ message: 'Login successful', user: user[0], token });
     } catch (err) {

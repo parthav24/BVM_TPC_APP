@@ -3,7 +3,7 @@ import { getUserProfile, updateUserProfile } from '../controllers/userController
 import authMiddleware from '../middlewares/authMiddleware.js';
 import upload from '../config/multerResumeConfig.js'; // Import multer config
 import { getAllApplications, submitApplication } from '../controllers/userControllers/applicationController.js';
-import { checkStudentRole } from '../middlewares/roleMiddleware.js';
+import { checkStudentRole, checkTpcOrStudentRole } from '../middlewares/roleMiddleware.js';
 import { getCompanyDetails, getCompanyRoleDetails } from '../controllers/userControllers/companyController.js';
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post('/submit-application', upload.single('resume'), authMiddleware, chec
 router.get('/get-all-application', authMiddleware, checkStudentRole, getAllApplications);
 
 // display company
-router.get('/get-companies', authMiddleware, checkStudentRole, getCompanyDetails)
+router.get('/get-companies', authMiddleware, checkTpcOrStudentRole, getCompanyDetails)
 router.get('/get-company-roles/:company_id', authMiddleware, checkStudentRole, getCompanyRoleDetails)
 
 export default router;

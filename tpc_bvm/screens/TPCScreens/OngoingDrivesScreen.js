@@ -1,56 +1,122 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import connString from "../../components/connectionString";
 
 const OngoingDrivesScreen = () => {
   const navigation = useNavigation();
+  const [placementDrives, setPlacementDrives] = useState({
+    upcoming: [],
+    ongoing: [],
+    completed: [],
+  });
 
-  const ongoingDrives = [
-    { id: '1', companyName: 'Company A', students: [/* list of students */] },
-    { id: '2', companyName: 'Company B', students: [/* list of students */] },
-    // Add more companies here
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${connString}/user/get-companies`);
+        const currentDate = new Date();
+
+        const upcoming = [];
+        const ongoing = [];
+        const completed = [];
+
+        response.data.forEach((company) => {
+          const deadline = new Date(company.deadline);
+          const visitDate = company.visit_date
+            ? new Date(company.visit_date)
+            : null;
+          const completeDate = company.complete_date
+            ? new Date(company.complete_date)
+            : null;
+
+          if (completeDate) {
+            completed.push(company);
+          } else if (
+            deadline > currentDate ||
+            (deadline < currentDate && (!visitDate || visitDate >= currentDate))
+          ) {
+            upcoming.push(company);
+          } else if (visitDate && visitDate < currentDate && !completeDate) {
+            ongoing.push(company);
+          }
+        });
+
+        setPlacementDrives({
+          upcoming,
+          ongoing,
+          completed,
+        });
+      } catch (error) {
+        console.error(
+          "Company data fetch failed:",
+          error.response ? error.response.data : error.message
+        );
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleCompanySelect = (company) => {
-    navigation.navigate('Company Student Details', { company });
+    navigation.navigate("Company Student Details", { company });
   };
 
   const renderOngoingDrives = ({ item }) => (
-    <TouchableOpacity onPress={() => handleCompanySelect(item)} style={styles.companyContainer}>
+    <TouchableOpacity
+      onPress={() => handleCompanySelect(item)}
+      style={styles.companyContainer}
+    >
       <Text style={styles.companyText}>{item.companyName}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ongoing Drives</Text>
-      <FlatList
-        data={ongoingDrives}
-        renderItem={renderOngoingDrives}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.drivesList}
-      />
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>Ongoing Drives</Text>
+        <FlatList
+          data={placementDrives?.ongoing}
+          renderItem={renderOngoingDrives}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.drivesList}
+        />
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>Completed Drives</Text>
+        <FlatList
+          data={placementDrives?.completed}
+          renderItem={renderOngoingDrives}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.drivesList}
+        />
+      </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: "#f7f7f7",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   companyContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     marginVertical: 5,
     borderRadius: 8,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
   },
   companyText: {
