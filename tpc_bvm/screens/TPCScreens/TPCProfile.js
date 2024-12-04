@@ -12,16 +12,13 @@ export default function TPCProfile({ navigation }) {
   const [tpcDetails, setTpcDetails] = useState(null);
   const [tpoDetails, setTpoDetails] = useState(null);
   const [tpcMembers, setTpcMembers] = useState(null);
-  // useEffect(() => {
-  //   console.log(tpcDetails);
-  // }, [tpcDetails]);
+  useEffect(() => {
+    console.log(tpcDetails);
+  }, [tpcMembers]);
   useEffect(() => {
     const fetchTpcData = async () => {
       try {
         const response = await axios.get(`${connString}/tpc/get-profile`);
-        console.log(response.data.tpcData);
-        console.log("Hello");
-
         setTpcDetails(response.data.tpcData);
       } catch (err) {
         console.log("Error while fetching tpc profile", err.message);
@@ -30,23 +27,21 @@ export default function TPCProfile({ navigation }) {
     const fetchTpoData = async () => {
       try {
         const response = await axios.get(`${connString}/tpc/get-tpo-name`);
-        console.log(response.data.tpoData);
-        console.log("Hello");
-
         setTpoDetails(response.data.tpoData);
       } catch (err) {
-        console.log("Error while fetching tpc profile", err.message);
+        console.log("Error while fetching tpo profile", err.message);
       }
     }
     const fetchTpcMembersData = async () => {
       try {
-        const response = await axios.get(`${connString}/tpc/get-tpc-members`);
-        console.log(response.data.tpcMembersData);
         console.log("Hello");
+        const response = await axios.get(`${connString}/tpc/get-tpc-members`);
+        console.log("Hello");
+        console.log(response.data.tpcMembersData);
 
-        setTpoDetails(response.data.tpcMembersData);
+        setTpcMembers(response.data.tpcMembersData);
       } catch (err) {
-        console.log("Error while fetching tpc profile", err.message);
+        console.log("Error while fetching tpc members", err.message);
       }
     }
     fetchTpcData();
@@ -98,14 +93,14 @@ export default function TPCProfile({ navigation }) {
 
       <View style={styles.card}>
         <Text style={styles.subTitle}>Members:</Text>
-        {/* {tpcDetails.members.map((member, index) => (
+        {tpcMembers?.map((member, index) => (
           <View key={index} style={styles.memberContainer}>
-            <Text style={styles.memberName}>Name: {member.name}</Text>
-            <Text>Branch: {member.branch}</Text>
+            <Text style={styles.memberName}>Name: {member.f_name} {member.l_name}</Text>
+            <Text>Branch: {tpcDetails?.dept_name}</Text>
             <Text>Email: {member.email}</Text>
-            <Text>Phone: {member.phone}</Text>
+            <Text>Phone: {member.mobile}</Text>
           </View>
-        ))} */}
+        ))}
       </View>
 
       <TouchableOpacity

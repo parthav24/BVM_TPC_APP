@@ -93,6 +93,7 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
 
             alert("Applied")
             setModalVisible(false); // Close modal on success
+            
         } catch (error) {
             alert(error.message);
             console.log(error);

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import sequelize from '../config/database.js';
 
 export const studentRegister = async (req, res) => {
-    const { uid, dept_id,f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, ssc_percentage, hsc_percentage, diploma_cpi, no_active_backlog, no_dead_backlog } = req.body;
+    const { uid, dept_id, f_name, m_name, l_name, dob, gender, email, mobile, address, password, passout_year, sem1, sem2, sem3, sem4, sem5, sem6, sem7, sem8, ssc_percentage, hsc_percentage, diploma_cpi, no_active_backlog, no_dead_backlog } = req.body;
 
     const new_dob = new Date(dob).toISOString().slice(0, 10);
 
@@ -99,8 +99,9 @@ export const login = async (req, res) => {
         if (user.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
+
         req.user = user[0];
-        
+
         // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user[0].password);
         if (!isMatch) {
@@ -108,12 +109,11 @@ export const login = async (req, res) => {
         }
         
         const token = jwt.sign(
-            { uid: user[0].uid, role: user[0].role,passout_year:user[0].passout_year },
+            { uid: user[0].uid, role: user[0].role,passout_year:user[0].passout_year,dept_id:user[0].dept_id },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION }
         );
         delete user[0].password;
-        console.log("Login",req.user);
         // If the password matches, proceed with login
         res.status(200).json({ message: 'Login successful', user: user[0], token });
     } catch (err) {

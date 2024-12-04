@@ -1,6 +1,99 @@
 import sequelize from "../../config/database.js";
 import { addPlacementData } from "./placementController.js";
 
+export const handleCandidatesRound = async (req, res) => {
+    try {
+        const { moveToNextRound, rejectForCurrentRound } = req.body;
+
+        // Validation: Ensure both arrays are provided
+        if (!Array.isArray(moveToNextRound) || !Array.isArray(rejectForCurrentRound)) {
+            return res.status(400).json({ message: "Invalid input data" });
+        }
+
+        await sequelize.transaction(async (t) => {
+            // Move candidates to the next round
+            if (moveToNextRound.length > 0) {
+                await sequelize.query(
+                    `UPDATE application 
+                     SET round_reached = round_reached + 1 
+                     WHERE application_id IN [?]`,
+                    {
+                        replacements: [moveToNextRound],
+                        type: sequelize.QueryTypes.UPDATE,
+                        transaction: t,
+                    }
+                );
+            }
+
+            // Reject candidates for the current round
+            if (rejectForCurrentRound.length > 0) {
+                await sequelize.query(
+                    `UPDATE application 
+                     SET status = 'rejected' 
+                     WHERE application_id IN [?]`,
+                    {
+                        replacements: [rejectForCurrentRound],
+                        type: sequelize.QueryTypes.UPDATE,
+                        transaction: t,
+                    }
+                );
+            }
+        });
+
+        res.status(200).json({ message: "Round update completed successfully" });
+    } catch (err) {
+        console.error("Error in handleRoundCandidates", err.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const getLastRoundStudents = async (req, res) => {
+    try {
+        const { company_id } = req.query;
+        await sequelize.transaction(async (t) => {
+            const lastRoundData = await sequelize.query(
+                `SELECT * FROM application JOIN students ON application.uid = students.uid WHERE status = 'pending' AND company_id = ?`,
+                {
+                    replacements: [company_id],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t,
+                }
+            );
+
+            console.log(lastRoundData);
+
+            res.status(200).json(lastRoundData);
+        })
+    } catch (err) {
+        console.error("Error in handleRoundCandidates", err.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const getApplicationData = async (req, res) => {
+    try {
+        const { company_id } = req.query;
+        await sequelize.transaction(async (t) => {
+            const applicationData = await sequelize.query(
+                `SELECT * FROM application JOIN students ON application.uid = students.uid WHERE company_id = ?`,
+                {
+                    replacements: [company_id],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t,
+                }
+            );
+
+            console.log(applicationData);
+
+            res.status(200).json(applicationData);
+        })
+    } catch (err) {
+        console.error("Error in handleRoundCandidates", err.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+
 export const moveNextRound = async (req, res) => {
     try {
         const { application_id } = req.body;
@@ -45,6 +138,8 @@ export const rejectCandidate = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" })
     }
 }
+
+
 
 export const selectCandidate = async (req, res) => {
     try {

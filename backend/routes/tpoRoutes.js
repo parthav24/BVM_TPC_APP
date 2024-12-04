@@ -7,6 +7,7 @@ import { createDepartment, getDepartments, getDepartmentById, updateDepartment, 
 
 import { approveUser, rejectUser } from "../controllers/tpcControllers/approveRejectController.js";
 import { editCandidateDetails, getApprovedCandidates, getPendingCandidates } from "../controllers/tpcControllers/userController.js";
+import { getTpcMembers } from '../controllers/tpoControllers/tpoProfileController.js';
 
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.get('/get-department-by-id/:dept_id', authMiddleware, checkTpoRole, getDe
 router.put('/update-department/:dept_id', authMiddleware, checkTpoRole, updateDepartment);
 router.delete('/delete-department/:dept_id', authMiddleware, checkTpoRole, deleteDepartment);
 
+//profile routes
+router.get('/get-tpc-members',authMiddleware,checkTpoRole,getTpcMembers);
 
 // // approve and reject user applications routes
 // router.post("/approveUser", authMiddleware, checkTpoRole, approveUser);
