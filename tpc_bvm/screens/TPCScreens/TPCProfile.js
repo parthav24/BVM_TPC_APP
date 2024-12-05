@@ -103,21 +103,6 @@ export default function TPCProfile({ navigation }) {
         ))}
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Statistics")}
-      >
-        <Text style={styles.buttonText}>Placement Statistics</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Student Applications")}
-      >
-        <Text style={styles.buttonText}>View Application</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Add Placement Data")}>
-        <Text style={styles.buttonText}>Add Placement Data</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>

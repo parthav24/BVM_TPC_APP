@@ -59,13 +59,14 @@ const AddPlacementScreen = () => {
                         style={styles.picker}
                         onValueChange={(itemValue) => { setSelectedUid(itemValue.split('@')[0]); setSelectedCompanyId(itemValue.split('@')[1]) }}
                     >
+                        <Picker.Item key={100000} label={"Select Student"} value={"Select Student"} />
                         {applications?.map((app) => (
                             <Picker.Item key={app.uid} label={app.uid.toString() + "\t\t\t\t\t\t\t\t\t" + app.name.toString()} value={app.uid + "@" + app.company_id} />
                         ))}
                     </Picker>
 
 
-                    <Text style={styles.label}>Package Offered:</Text>
+                    <Text style={styles.label}>Package Offered(LPA):</Text>
                     <TextInput
                         style={styles.input}
                         keyboardType="numeric"

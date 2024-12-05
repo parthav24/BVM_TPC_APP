@@ -7,7 +7,7 @@ import { addRole, updateRole, deleteRole, getRoles, getRoleById } from "../contr
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { checkTpcOrTpoRole, checkTpcRole } from "../middlewares/roleMiddleware.js";
 
-import { getApplicationData, getLastRoundStudents, getSelectedCandidates, handleCandidatesRound, moveNextRound, rejectCandidate, selectCandidate } from "../controllers/tpcControllers/applicationController.js";
+import { getApplicationData, getLastRoundStudents, getSelectedCandidates, handleCandidatesRound, completeDrive, selectCandidate } from "../controllers/tpcControllers/applicationController.js";
 import { addPlacementData } from "../controllers/tpcControllers/placementController.js";
 import { editCandidateDetails, getApprovedCandidates, getPendingCandidates } from "../controllers/tpcControllers/userController.js";
 import { getTpcProfile, getTpoName, getTpcMembers } from "../controllers/tpcControllers/tpcProfileController.js";
@@ -36,8 +36,8 @@ router.get('/get-role-by-id/:role_id', authMiddleware, checkTpcRole, getRoleById
 
 // modify application status and round_reached
 router.put('/move-next-round', authMiddleware, checkTpcRole, handleCandidatesRound);
-router.put('/reject-candidate', authMiddleware, checkTpcRole, rejectCandidate);
-router.put('/select-candidate', authMiddleware, checkTpcRole, selectCandidate);
+router.put('/complete-drive', authMiddleware, checkTpcRole, completeDrive);
+// router.put('/select-candidate', authMiddleware, checkTpcRole, selectCandidate);
 router.get('/get-selected-candidates', authMiddleware, checkTpcRole, getSelectedCandidates);
 router.get('/get-last-round-candidates', authMiddleware, checkTpcRole, getLastRoundStudents);
 router.get('/get-all-round-candidates', authMiddleware, checkTpcRole, getApplicationData);

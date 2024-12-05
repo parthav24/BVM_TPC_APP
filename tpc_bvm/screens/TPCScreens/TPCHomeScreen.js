@@ -28,6 +28,19 @@ export default function TPCHomeScreen({ navigation }) {
           <Ionicons name="play-outline" size={40} color="#4A90E2" />
           <Text style={styles.optionText}>Ongoing Drives</Text>
         </TouchableOpacity>
+
+
+        {/* Add Placement Data */}
+        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('Add Placement Data')}>
+          <Ionicons name="add-circle-outline" size={40} color="#4A90E2" />
+          <Text style={styles.optionText}>Add Placement Data</Text>
+        </TouchableOpacity>
+
+        {/* Placement Statistics */}
+        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('Statistics')}>
+          <Ionicons name="stats-chart-outline" size={40} color="#4A90E2" />
+          <Text style={styles.optionText}>Placement Statistics</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView >
   );
@@ -41,12 +54,14 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
   option: {
     alignItems: 'center',
     width: '30%',
+    marginBottom: 25,
   },
   optionText: {
     marginTop: 10,

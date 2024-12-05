@@ -4,6 +4,7 @@ import { addPlacementData } from "./placementController.js";
 export const handleCandidatesRound = async (req, res) => {
     try {
         const { moveToNextRound, rejectForCurrentRound } = req.body;
+        console.log(moveToNextRound);
 
         // Validation: Ensure both arrays are provided
         if (!Array.isArray(moveToNextRound) || !Array.isArray(rejectForCurrentRound)) {
@@ -16,7 +17,7 @@ export const handleCandidatesRound = async (req, res) => {
                 await sequelize.query(
                     `UPDATE application 
                      SET round_reached = round_reached + 1 
-                     WHERE application_id IN [?]`,
+                     WHERE application_id IN (?)`,
                     {
                         replacements: [moveToNextRound],
                         type: sequelize.QueryTypes.UPDATE,
@@ -30,7 +31,7 @@ export const handleCandidatesRound = async (req, res) => {
                 await sequelize.query(
                     `UPDATE application 
                      SET status = 'rejected' 
-                     WHERE application_id IN [?]`,
+                     WHERE application_id IN (?)`,
                     {
                         replacements: [rejectForCurrentRound],
                         type: sequelize.QueryTypes.UPDATE,
@@ -59,9 +60,6 @@ export const getLastRoundStudents = async (req, res) => {
                     transaction: t,
                 }
             );
-
-            console.log(lastRoundData);
-
             res.status(200).json(lastRoundData);
         })
     } catch (err) {
@@ -93,53 +91,52 @@ export const getApplicationData = async (req, res) => {
     }
 }
 
-
-export const moveNextRound = async (req, res) => {
+export const completeDrive = async (req, res) => {
     try {
-        const { application_id } = req.body;
+        const { moveToNextRound, rejectForCurrentRound } = req.body;
+        console.log(moveToNextRound);
+
+        // Validation: Ensure both arrays are provided
+        if (!Array.isArray(moveToNextRound) || !Array.isArray(rejectForCurrentRound)) {
+            return res.status(400).json({ message: "Invalid input data" });
+        }
+
         await sequelize.transaction(async (t) => {
-            await sequelize.query(
-                `UPDATE application 
-                SET round_reached = round_reached+1 
-                WHERE application_id= ?`,
-                {
-                    replacements: [application_id],
-                    type: sequelize.QueryTypes.UPDATE,
-                    transaction: t
-                }
-            )
+            // select candidates 
+            if (moveToNextRound.length > 0) {
+                await sequelize.query(
+                    `UPDATE application 
+                     SET status = 'accepted' 
+                     WHERE application_id IN (?)`,
+                    {
+                        replacements: [moveToNextRound],
+                        type: sequelize.QueryTypes.UPDATE,
+                        transaction: t,
+                    }
+                );
+            }
+
+            // Reject candidates for the current round
+            if (rejectForCurrentRound.length > 0) {
+                await sequelize.query(
+                    `UPDATE application 
+                     SET status = 'rejected' 
+                     WHERE application_id IN (?)`,
+                    {
+                        replacements: [rejectForCurrentRound],
+                        type: sequelize.QueryTypes.UPDATE,
+                        transaction: t,
+                    }
+                );
+            }
         });
-        res.status(200).json({ message: "Congratulations for clearing round" });
-    }
-    catch (err) {
-        console.log("Error in moveNextRound", err.message);
+
+        res.status(200).json({ message: "students selected successfully" });
+    } catch (err) {
+        console.error("Error in complete drive", err.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
-
-export const rejectCandidate = async (req, res) => {
-    try {
-        const { application_id } = req.body;
-        await sequelize.transaction(async (t) => {
-            await sequelize.query(
-                `UPDATE application 
-                SET status = 'rejected' 
-                WHERE application_id = ?`,
-                {
-                    replacements: [application_id],
-                    type: sequelize.QueryTypes.UPDATE,
-                    transaction: t
-                }
-            )
-        });
-        res.status(200).json({ message: "Unfortunately, you will not be moving to the next round of interviews." })
-    } catch (err) {
-        console.log("Error in rejectCandidate", err.message);
-        res.status(500).json({ message: "Internal Server Error" })
-    }
-}
-
-
 
 export const selectCandidate = async (req, res) => {
     try {

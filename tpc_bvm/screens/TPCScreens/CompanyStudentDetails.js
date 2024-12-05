@@ -31,6 +31,7 @@ const StudentSelection = () => {
       setStudentData(response.data);
       const studentIds = response.data.map((item) => item.uid);
       setUnSelectedStudents(studentIds);
+      setSelectedStudents([]);
     }
     catch (error) {
       console.error(
@@ -63,23 +64,44 @@ const StudentSelection = () => {
       "Are you sure you want to end the drive?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Yes", onPress: () => console.log("Drive Ended") },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              const moveToNextRound = studentData
+                .filter((student) => selectedStudents.includes(student.uid))
+                .map((student) => student.application_id);
+
+              const rejectForCurrentRound = studentData
+                .filter((student) => unSelectedStudents.includes(student.uid))
+                .map((student) => student.application_id);
+              if (moveToNextRound.length > 0) {
+                const response = await axios.put(`${connString}/tpc/complete-drive`,
+                  {
+                    moveToNextRound,
+                    rejectForCurrentRound
+                  });
+                fetchData();
+                console.log("Drive ended successfully:", response.data);
+                // Handle success (e.g., navigate, update state, etc.)
+              }
+              else {
+                Alert.alert("Error", "Select atleast 1 student");
+              }
+
+            } catch (error) {
+              console.error("Error ending the drive:", error);
+              // Handle error (e.g., show an error message)
+            }
+          }
+        },
       ],
       { cancelable: true }
     );
+
   };
 
   const handleNextRound = async () => {
-    console.log("Selected Students:", selectedStudents);
-    console.log("Unselected Students:", unSelectedStudents);
-
-    Alert.alert(
-      "Next Round",
-      `Selected Students: ${selectedStudents.join(
-        ", "
-      )}\nUnselected Students: ${unSelectedStudents.join(", ")}`
-    );
-
     const moveToNextRound = studentData
       .filter((student) => selectedStudents.includes(student.uid))
       .map((student) => student.application_id);
@@ -89,21 +111,33 @@ const StudentSelection = () => {
       .map((student) => student.application_id);
 
 
-    // try {
-    //   const response = await axios.put(`${connString}/tpc/move-next-round`,
-    //     {
-    //       moveToNextRound,
-    //       rejectForCurrentRound
-    //     }
-    //   );
-    //   fetchData();
-    // }
-    // catch (error) {
-    //   console.error(
-    //     "Student selection fetch failed:",
-    //     error.response ? error.response.data : error.message
-    //   );
-    // }
+    try {
+      if (moveToNextRound.length > 0) {
+        Alert.alert(
+          "Next Round",
+          `Selected Students: ${selectedStudents.join(
+            ", "
+          )}\nUnselected Students: ${unSelectedStudents.join(", ")}`
+        );
+
+        const response = await axios.put(`${connString}/tpc/move-next-round`,
+          {
+            moveToNextRound,
+            rejectForCurrentRound
+          }
+        );
+        fetchData();
+      }
+      else {
+        Alert.alert("Error", "Select atleast 1 student");
+      }
+    }
+    catch (error) {
+      console.error(
+        "Student selection fetch failed:",
+        error.response ? error.response.data : error.message
+      );
+    }
   };
 
   const renderItem = ({ item, index }) => (

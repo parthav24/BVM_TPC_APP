@@ -1,12 +1,12 @@
 import express from 'express';
 import { tpcRegister } from '../controllers/tpoControllers/tpcManageController.js';
 import { tpoRegister } from '../controllers/tpoControllers/tpoManageController.js';
-import { checkTpoRole } from '../middlewares/roleMiddleware.js';
+import { checkTpcOrTpoRole, checkTpoRole } from '../middlewares/roleMiddleware.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import { createDepartment, getDepartments, getDepartmentById, updateDepartment, deleteDepartment } from '../controllers/tpoControllers/deptController.js';
 
-import { approveUser, rejectUser } from "../controllers/tpcControllers/approveRejectController.js";
-import { editCandidateDetails, getApprovedCandidates, getPendingCandidates } from "../controllers/tpcControllers/userController.js";
+import { approveUser, rejectUser } from "../controllers/tpoControllers/approveRejectController.js";
+import { editCandidateDetails, getApprovedCandidates, getPendingCandidates } from "../controllers/tpoControllers/userController.js";
 import { getTpcMembers } from '../controllers/tpoControllers/tpoProfileController.js';
 
 const router = express.Router();
@@ -25,12 +25,12 @@ router.delete('/delete-department/:dept_id', authMiddleware, checkTpoRole, delet
 router.get('/get-tpc-members',authMiddleware,checkTpoRole,getTpcMembers);
 
 // // approve and reject user applications routes
-// router.post("/approveUser", authMiddleware, checkTpoRole, approveUser);
-// router.post("/rejectUser", authMiddleware, checkTpoRole, rejectUser);
-// router.post("/edit-candidate-details", authMiddleware, checkTpoRole, editCandidateDetails);
+router.post("/approveUser", authMiddleware, checkTpoRole, approveUser);
+router.post("/rejectUser", authMiddleware, checkTpoRole, rejectUser);
+router.post("/edit-candidate-details", authMiddleware, checkTpcOrTpoRole, editCandidateDetails);
 
 // //Route for get pending and approved students 
-// router.get("/get-approved-candidates", authMiddleware, checkTpoRole, getApprovedCandidates);
-// router.get("/get-pending-candidates", authMiddleware, checkTpoRole, getPendingCandidates);
+router.get("/get-approved-candidates", authMiddleware, checkTpoRole, getApprovedCandidates);
+router.get("/get-pending-candidates", authMiddleware, checkTpoRole, getPendingCandidates);
 
 export default router;

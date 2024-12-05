@@ -4,11 +4,11 @@ export const getApprovedCandidates = async (req, res) => {
     try {
         await sequelize.transaction(async (t) => {
             console.log(req.user);
-
+            const { departments } = req.query;
             const approved_students = await sequelize.query(
-                `SELECT * FROM students JOIN result ON students.uid=result.id WHERE dept_id=?`,
+                `SELECT * FROM students JOIN result ON students.uid=result.id WHERE dept_id IN (?)`,
                 {
-                    replacements: [req.user.dept_id],
+                    replacements: [departments],
                     type: sequelize.QueryTypes.SELECT,
                     transaction: t
                 }
@@ -23,13 +23,15 @@ export const getApprovedCandidates = async (req, res) => {
 }
 export const getPendingCandidates = async (req, res) => {
     try {
+        const { departments } = req.query;
         await sequelize.transaction(async (t) => {
             console.log(req.user);
 
             const pending_students = await sequelize.query(
-                `SELECT * FROM pending_students JOIN pending_results ON pending_students.uid=pending_results.id WHERE dept_id=?`,
+                `SELECT * FROM pending_students JOIN pending_results ON pending_students.uid=pending_results.id
+                WHERE dept_id IN (?)`,
                 {
-                    replacements: [req.user.dept_id],
+                    replacements: [departments],
                     type: sequelize.QueryTypes.SELECT,
                     transaction: t
                 }

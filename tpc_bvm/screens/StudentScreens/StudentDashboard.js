@@ -63,7 +63,9 @@ export default function StudentDashboard() {
             ongoing.push(company);
           }
         });
-
+        upcoming.reverse();
+        ongoing.reverse();
+        completed.reverse();
         setPlacementDrives({
           upcoming,
           ongoing,
@@ -76,21 +78,34 @@ export default function StudentDashboard() {
     };
     fetchData();
   }, []);
+  const checkIsApplied = async (company_id) => {
+    try {
 
+      const response = await axios.get(`${connString}/user/get-applicationdata-by-uid-company-id/${company_id}`);
+      console.log('response 2', response.data);
+
+      if (response.data.application.length > 0) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.log("Error which checking applied or not");
+      return false;
+    }
+  }
   const isEligible = (item) => {
     if (!userData) return true;
     const meetsCPI = userData.cpi >= item.req_CPI;
-
+    const isApplied = checkIsApplied(item.company_id);
     const meetsBacklogs = (item.max_active_backlogs === null || userData.no_active_backlog <= item.max_active_backlogs) &&
       (item.max_dead_backlogs === null || userData.no_dead_backlog <= item.max_dead_backlogs);
     const deadlineCheck = (new Date(item.deadline) >= Date.now())
     if (!(meetsCPI && meetsBacklogs)) {
       setError("You are not eligible for this position")
     }
-    else {
+    else if (!deadlineCheck) {
       setError("Application Deadline Closed")
     }
-
     return (meetsCPI && meetsBacklogs && deadlineCheck);
   };
 
