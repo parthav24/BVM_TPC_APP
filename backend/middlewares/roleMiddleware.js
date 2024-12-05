@@ -30,12 +30,19 @@ export const checkStudentRole = async (req, res, next) => {
     });
   }
 };
-
 export const checkTpcOrStudentRole = async(req,res,next)=>{
-  
   if (req.user && (req.user.role === "student" || req.user.role === "tpc")) {
     console.log("CheckTPCOrStudent"+req.user.passout_year);
     return next(); // User has tpc or student role, proceed to the next middleware or route handler
+  } else {
+    return res.status(403).json({
+      message: "Forbidden: You do not have permission to perform this action",
+    });
+  }
+}
+export const checkTpcOrTpoRole = async(req,res,next)=>{
+  if (req.user && (req.user.role === "tpc" || req.user.role === "tpo")) {
+    return next(); // User has tpc or tpo role, proceed to the next middleware or route handler
   } else {
     return res.status(403).json({
       message: "Forbidden: You do not have permission to perform this action",

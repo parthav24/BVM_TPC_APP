@@ -17,7 +17,11 @@ const OngoingDrivesScreen = () => {
     ongoing: [],
     completed: [],
   });
-
+  useEffect(()=>{
+    // console.log(placementDrives.ongoing);
+    // console.log(placementDrives.completed);
+    
+  },[placementDrives])
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,7 +69,12 @@ const OngoingDrivesScreen = () => {
   }, []);
 
   const handleCompanySelect = (company) => {
-    navigation.navigate("Company Student Details", { company });
+    let flag = 0;
+    for(i=0;i<placementDrives.ongoing.length;i++){
+      if(placementDrives.ongoing[i].name===company.name) flag=1;
+    }
+    
+    navigation.navigate("Company Student Details", { company,flag});
   };
 
   const renderOngoingDrives = ({ item }) => (
@@ -73,7 +82,7 @@ const OngoingDrivesScreen = () => {
       onPress={() => handleCompanySelect(item)}
       style={styles.companyContainer}
     >
-      <Text style={styles.companyText}>{item.companyName}</Text>
+      <Text style={styles.companyText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
@@ -116,10 +125,11 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 5,
     borderRadius: 8,
-    borderColor: "#ddd",
+    borderColor: "#000",
     borderWidth: 1,
   },
   companyText: {
+    color:'#000',
     fontSize: 18,
   },
   drivesList: {

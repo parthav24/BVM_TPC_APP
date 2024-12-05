@@ -59,6 +59,12 @@ export default function TPCHomeScreen({ navigation }) {
           <Ionicons name="school-outline" size={40} color="#4A90E2" />
           <Text style={styles.optionText}>Add Department</Text>
         </TouchableOpacity>
+
+        {/* Placement Statistics */}
+        <TouchableOpacity style={styles.option} onPress={() => handleNavigate('Statistics')}>
+          <Ionicons name="stats-chart-outline" size={40} color="#4A90E2" />
+          <Text style={styles.optionText}>Placement Statistics</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -88,3 +94,5 @@ const styles = StyleSheet.create({
     color: "#333",
   },
 });
+
+

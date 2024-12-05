@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import axios from 'axios';
 import CheckBox from 'react-native-check-box';
 import * as DocumentPicker from 'expo-document-picker';
@@ -12,6 +12,15 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
     const [userData, setUserData] = useState(null);
     const [resume, setResume] = useState(null); // To store the resume file
 
+    const checkIsApplied = async () => {
+        const response = await axios.get(`${connString}/user/get-applicationdata-by-uid-company-id/${selectedDrive.company_id}`);
+        console.log('response 2', response.data);
+
+        if (response.data.application.length > 0) {
+            return true;
+        }
+        return false;
+    }
     useEffect(() => {
         const fetchRoles = async () => {
             try {
@@ -62,6 +71,15 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
 
     const handleApplySubmit = async () => {
         try {
+
+            const response1 = await axios.get(`${connString}/user/get-placementdata-by-uid`);
+            console.log('response 1', response1.data);
+
+            if (response1.data.placement_data.length > 0) {
+                Alert.alert("Notice", "You already placed, can not opt multiple offer");
+                return;
+            }
+            // if (checkIsApplied()) { Alert.alert("Notice", "You already Applied!"); setModalVisi ble(false); return; }
             if (selectedDrive.role && selectedRoles.length === 0) {
                 throw new Error("Atleast One role is required!")
             }
@@ -79,7 +97,7 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
                     type: 'application/pdf'
                 });
             }
-
+            // 
             const response = await axios.post(`${connString}/user/submit-application`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data', // Multipart form data is required for file upload
@@ -91,11 +109,11 @@ const ApplyModal = ({ modalVisible, setModalVisible, selectedDrive }) => {
             // alert(response.data.message);
             console.log(response.data);
 
-            alert("Applied")
+            alert("Applied Successfully")
             setModalVisible(false); // Close modal on success
         } catch (error) {
-            alert(error.message);
-            console.log(error);
+            alert(error.response ? error.response.data.error : error.message);
+            console.log("error");
 
             console.error('Error submitting application:', error.response ? error.response.data : error.message);
             setModalVisible(false); // Close modal on success

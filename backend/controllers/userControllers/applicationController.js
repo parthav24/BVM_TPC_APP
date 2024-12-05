@@ -6,6 +6,17 @@ export const submitApplication = async (req, res) => {
     try {
         await sequelize.transaction(async (t) => {
             // Step 1: Check if the company requires a resume
+            const already_placed = await sequelize.query(
+                `SELECT uid FROM placement_data WHERE uid = ?`,
+                {
+                    replacements: [uid],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t
+                }
+            );
+
+            console.log(already_placed[0]);
+
             const [company] = await sequelize.query(
                 `SELECT resume FROM company WHERE company_id = ?`,
                 {
@@ -55,7 +66,7 @@ export const submitApplication = async (req, res) => {
 
     } catch (error) {
         console.error('Error submitting application:', error);
-        return res.status(500).json({ error: 'Error submitting application' });
+        return res.status(500).json({ error: error.message });
     }
 }
 
@@ -74,6 +85,28 @@ export const getAllApplications = async (req, res) => {
                 }
             );
             return res.status(201).json({ allApplications });
+        });
+
+    } catch (error) {
+        console.error('Error fetching application:', error);
+        return res.status(500).json({ error: 'Error fetching application' });
+    }
+}
+export const getApplicationByUidAndCompanyId = async (req, res) => {
+    try {
+        await sequelize.transaction(async (t) => {
+            // Step 1: Check if the company requires a resume
+            console.log("get all application");
+            const { company_id } = req.params
+            const application = await sequelize.query(
+                `SELECT uid FROM application WHERE uid = ? AND company_id = ?`,
+                {
+                    replacements: [req.user.uid, company_id],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t
+                }
+            );
+            return res.status(201).json({ application });
         });
 
     } catch (error) {

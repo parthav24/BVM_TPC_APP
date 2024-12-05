@@ -4,7 +4,7 @@ import { TouchableOpacity, Image } from 'react-native';
 import TPOHomeScreen from '../screens/TPOScreens/TPOHomeScreen';
 import TPOProfile from '../screens/TPOScreens/TPOProfile'; // Import TPO Profile screen
 import EditStudentDetails from '../screens/TPCScreens/EditStudentDetails';
-import StudentApplications from '../screens/TPCScreens/StudentApplications';
+import StudentApplications from '../screens/TPOScreens/StudentApplications';
 import OngoingDrivesScreen from '../screens/TPCScreens/OngoingDrivesScreen';
 import CompanyStudentDetails from '../screens/TPCScreens/CompanyStudentDetails';
 import AddCompanyDetails from '../screens/TPCScreens/AddCompanyDetails';

@@ -13,10 +13,40 @@ export const addPlacementData = async (req, res) => {
                     transaction: t
                 }
             )
+            await sequelize.query(
+                `UPDATE company SET no_of_students_placed = no_of_students_placed+1 WHERE company_id = ?`,
+                {
+                    replacements: [company_id],
+                    type: sequelize.QueryTypes.UPDATE,
+                    transaction: t
+                }
+            )
             res.status(201).json({ message: "Inserted into Placement Data" });
         })
     } catch (err) {
         console.log("Error in addPlacementData", err.message);
+        res.status(500).json({ "message": "Internal Server Error" });
+    }
+}
+
+export const getPlacementDataByUID = async (req, res) => {
+    try {
+        await sequelize.transaction(async (t) => {
+            const placement_data = await sequelize.query(
+                `SELECT uid FROM
+                placement_data WHERE uid=?`,
+                {
+                    replacements: [req.user.uid],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t
+                }
+            )
+            console.log(placement_data);
+
+            res.status(200).json({ placement_data });
+        })
+    } catch (err) {
+        console.log("Error in getPlacementDataByUID", err.message);
         res.status(500).json({ "message": "Internal Server Error" });
     }
 }

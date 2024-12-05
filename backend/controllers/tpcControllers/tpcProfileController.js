@@ -19,6 +19,28 @@ export const getTpcProfile = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving user data', error: err.message });
     }
 };
+export const getTpcMembers = async (req, res) => {
+    try {
+        console.log("Hello");
+        console.log(req.user.dept_id);
+        
+        // Return user data
+        await sequelize.transaction(async (t) => {
+            const tpcMembersData = await sequelize.query(
+                `SELECT * FROM tpc WHERE dept_id = ?`,
+                {
+                    replacements: [req.user.dept_id],
+                    type: sequelize.QueryTypes.SELECT,
+                    transaction: t
+                }
+            )
+            console.log(tpcMembersData);
+            res.status(200).json({ tpcMembersData: tpcMembersData });
+        })
+    } catch (err) {
+        res.status(500).json({ message: 'Error retrieving user data', error: err.message });
+    }
+};
 export const getTpoName = async (req, res) => {
     try {
         // Return user data
@@ -31,10 +53,11 @@ export const getTpoName = async (req, res) => {
                     transaction: t
                 }
             )
-            console.log(tpoData[0]);
+            // console.log(tpoData[0]);
             res.status(200).json({ tpoData: tpoData[0] });
         })
     } catch (err) {
         res.status(500).json({ message: 'Error retrieving user data', error: err.message });
     }
 };
+
